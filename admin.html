@@ -192,14 +192,27 @@ function renderChart(data){
   ];
   if(chartInstance) chartInstance.destroy();
   chartInstance = new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{label:'Jumlah Responden', data:counts, backgroundColor:['#16a34a','#15803d','#22c55e','#84cc16','#facc15']}]
-    },
-    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
-  });
-}
+  type:'bar',
+  data:{
+    labels: ['Guru','Pegawai','VII','VIII','IX'],
+    datasets:[{
+      label:'Jumlah Responden',
+      data: counts,
+      backgroundColor: [
+        '#16a34a', // Guru - hijau gelap
+        '#15803d', // Pegawai - hijau sedang
+        '#22c55e', // VII - hijau terang
+        '#84cc16', // VIII - lime
+        '#facc15'  // IX - kuning
+      ]
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true}}
+  }
+});
 
 /* ===== EXPORT CSV ===== */
 function exportCSV(){
