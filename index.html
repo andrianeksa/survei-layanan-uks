@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="id">
 <head>
@@ -8,6 +9,7 @@
 
 <style>
 body { font-family: Nunito, sans-serif; }
+
 .option{
   border:2px solid #e5e7eb;
   padding:14px;
@@ -146,26 +148,8 @@ body { font-family: Nunito, sans-serif; }
 
 </div>
 
-<!-- ===== FIREBASE UMD ===== -->
-<script src="https://www.gstatic.com/firebasejs/10.15.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.15.0/firebase-database.js"></script>
-
 <script>
-/* ===== FIREBASE CONFIG ===== */
-const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-/* ===== DATA SURVEI ===== */
+/* ===== DATA ===== */
 const questions=[
  'Ruang UKS bersih dan nyaman',
  'Ketersediaan obat dan alat kesehatan',
@@ -185,121 +169,118 @@ let nama='', role='', kelas='', qi=0, answers=[];
 
 /* ===== NAV ===== */
 function go(id){
- ['home','form','survey','saran'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+ ['home','form','survey','saran']
+  .forEach(x=>document.getElementById(x).classList.add('hidden'));
  document.getElementById(id).classList.remove('hidden');
 }
 
+/* ===== STORAGE ===== */
+const load=()=>JSON.parse(localStorage.getItem('uks')||'[]');
+const save=d=>localStorage.setItem('uks',JSON.stringify(d));
+
 /* ===== HOME ===== */
 function updateHome(){
-  db.ref('survei').once('value',snap=>{
-    const d = snap.val();
-    if(!d) return;
-    const arr = Object.values(d);
-    const avgScoreVal = Math.round(arr.reduce((a,b)=>a+b.score,0)/arr.length);
-    document.getElementById('avgScore').textContent = avgScoreVal;
-    document.getElementById('statusText').textContent = avgScoreVal>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
-    document.getElementById('statusText').className = avgScoreVal>=80?
-      'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
-      'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+ const d=load(); if(!d.length)return;
+ const avg=Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
+ avgScore.textContent=avg;
+ statusText.textContent=avg>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
+ statusText.className=avg>=80?
+  'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
+  'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
 
-    document.getElementById('guru').textContent=0;
-    document.getElementById('pegawai').textContent=0;
-    document.getElementById('vii').textContent=0;
-    document.getElementById('viii').textContent=0;
-    document.getElementById('ix').textContent=0;
-
-    arr.forEach(x=>{
-      if(x.role==='Guru') document.getElementById('guru').textContent++;
-      if(x.role==='Pegawai') document.getElementById('pegawai').textContent++;
-      if(x.role==='Siswa'){
-        if(x.kelas==='VII') document.getElementById('vii').textContent++;
-        if(x.kelas==='VIII') document.getElementById('viii').textContent++;
-        if(x.kelas==='IX') document.getElementById('ix').textContent++;
-      }
-    });
-  });
+ guru.textContent=pegawai.textContent=vii.textContent=viii.textContent=ix.textContent=0;
+ d.forEach(x=>{
+  if(x.role==='Guru')guru.textContent++;
+  if(x.role==='Pegawai')pegawai.textContent++;
+  if(x.role==='Siswa'){
+    if(x.kelas==='VII')vii.textContent++;
+    if(x.kelas==='VIII')viii.textContent++;
+    if(x.kelas==='IX')ix.textContent++;
+  }
+ });
 }
 updateHome();
 
 /* ===== FORM ===== */
-const statusGroup = document.getElementById('statusGroup');
-const kelasGroup = document.getElementById('kelasGroup');
-const kelasBox = document.getElementById('kelasBox');
-
 statusGroup.querySelectorAll('.option').forEach(b=>{
-  b.onclick=()=>{
-    statusGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    role=b.dataset.v;
-    kelasBox.classList.toggle('hidden', role!=='Siswa');
-    if(role!=='Siswa') kelas='';
-    kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-  }
+ b.onclick=()=>{
+  statusGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  role=b.dataset.v;
+  kelasBox.classList.toggle('hidden',role!=='Siswa');
+ }
 });
 
 kelasGroup.querySelectorAll('.option').forEach(b=>{
-  b.onclick=()=>{
-    kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    kelas=b.dataset.v;
-  }
+ b.onclick=()=>{
+  kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  kelas=b.dataset.v;
+ }
 });
 
 function startSurvey(){
-  nama=document.getElementById('nama').value || '-';
-  if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
-  qi=0; answers=[];
-  go('survey'); renderQ();
+ nama = document.getElementById('nama').value || '-';
+ if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
+ qi=0; answers=[];
+ go('survey'); renderQ();
 }
 
 /* ===== SURVEY ===== */
 function renderQ(){
-  document.getElementById('qNum').textContent = `Pertanyaan ${qi+1} dari ${questions.length}`;
-  document.getElementById('qText').textContent = questions[qi];
-  const optionsDiv = document.getElementById('options');
-  const nextBtn = document.getElementById('nextBtn');
-  optionsDiv.innerHTML='';
-  nextBtn.disabled=true;
+ qNum.textContent=`Pertanyaan ${qi+1} dari ${questions.length}`;
+ qText.textContent=questions[qi];
+ options.innerHTML='';
+ nextBtn.disabled=true;
 
-  likert.forEach(l=>{
-    const d=document.createElement('div');
-    d.className='option';
-    d.textContent=l.t;
-    d.onclick=()=>{
-      optionsDiv.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-      d.classList.add('active');
-      answers[qi]=l.v;
-      nextBtn.disabled=false;
-    };
-    optionsDiv.appendChild(d);
-  });
+ likert.forEach(l=>{
+  const d=document.createElement('div');
+  d.className='option';
+  d.textContent=l.t;
+  d.onclick=()=>{
+   options.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+   d.classList.add('active');
+   answers[qi]=l.v;
+   nextBtn.disabled=false;
+  };
+  options.appendChild(d);
+ });
 
-  nextBtn.textContent = qi===questions.length-1?'Lanjutkan →':'Selanjutnya →';
+ nextBtn.textContent = qi===questions.length-1 ? 'Lanjutkan →' : 'Selanjutnya →';
 }
 
 function nextQ(){
-  if(qi<questions.length-1){ qi++; renderQ(); }
-  else go('saran');
+ if(qi<questions.length-1){ qi++; renderQ(); }
+ else go('saran');
 }
 
 /* ===== SUBMIT ===== */
-function submitSurvey(){
-  const score=Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
-  const saran=document.getElementById('saranText').value;
+function submitSurvey() {
+  const score = Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
+  const saran = document.getElementById('saranText').value;
 
   const data = {
-    nama, role, kelas, score, saran,
-    timestamp: new Date().toLocaleString()
+    nama,
+    role,
+    kelas,
+    score,
+    saran
   };
 
-  firebase.database().ref('survei').push(data, err=>{
-    if(err) alert('Gagal mengirim survei');
-    else{
-      alert('Survei berhasil dikirim ✅');
-      document.getElementById('saranText').value='';
-      updateHome();
-      go('home');
-    }
+  fetch("https://script.google.com/macros/s/AKfycbyu67JwWnCoDakmN2SolG5ezPq7qdiK9VwacCYLiSzXo7aNPH8QBDclQuKXRQ7P3zMM/exec", {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(resp => {
+    alert("Survei berhasil dikirim!");
+    // Reset
+    document.getElementById('saranText').value='';
+    updateHome();
+    go('home');
+  })
+  .catch(err => {
+    alert("Gagal kirim survei: " + err);
   });
 }
 </script>
