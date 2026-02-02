@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Admin Survei UKS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body{font-family:Nunito,sans-serif}
+.hidden{display:none}
+</style>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-6">
+
+<div class="max-w-5xl mx-auto">
+
+<!-- ============ LOGIN ============ -->
+<section id="loginBox" class="bg-white rounded-2xl shadow p-6 max-w-md mx-auto">
+  <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">
+    🔐 Login Admin UKS
+  </h2>
+
+  <input id="pass"
+    type="password"
+    placeholder="Password admin"
+    class="w-full border-2 rounded-xl p-3 mb-4">
+
+  <button onclick="login()"
+    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+    Masuk
+  </button>
+</section>
+
+<!-- ============ ADMIN PANEL ============ -->
+<section id="adminPanel" class="hidden">
+
+  <h1 class="text-3xl font-extrabold text-green-700 mb-6">
+    📊 Dashboard Admin UKS
+  </h1>
+
+  <!-- Ringkasan -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white p-4 rounded-xl shadow">
+      <p class="text-sm text-gray-500">Total Responden</p>
+      <p id="total" class="text-3xl font-bold text-green-600">0</p>
+    </div>
+    <div class="bg-white p-4 rounded-xl shadow">
+      <p class="text-sm text-gray-500">Rata-rata Skor</p>
+      <p id="avg" class="text-3xl font-bold text-blue-600">0</p>
+    </div>
+    <div class="bg-white p-4 rounded-xl shadow">
+      <p class="text-sm text-gray-500">Jumlah Saran</p>
+      <p id="saranCount" class="text-3xl font-bold text-orange-600">0</p>
+    </div>
+  </div>
+
+  <!-- Tombol -->
+  <div class="flex flex-wrap gap-3 mb-4">
+    <button onclick="exportCSV()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold">
+      ⬇ Export Excel
+    </button>
+    <button onclick="clearData()"
+      class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold">
+      🗑 Hapus Semua Data
+    </button>
+  </div>
+
+  <!-- Tabel -->
+  <div class="bg-white rounded-2xl shadow overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-green-600 text-white">
+        <tr>
+          <th class="p-2">No</th>
+          <th>Status</th>
+          <th>Kelas</th>
+          <th>Skor</th>
+          <th>Saran</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+</section>
+
+</div>
+
+<script>
+const ADMIN_PASS = "uks9bantul";
+const KEY = "uks";
+
+/* ===== LOGIN ===== */
+function login(){
+  if(pass.value === ADMIN_PASS){
+    loginBox.classList.add('hidden');
+    adminPanel.classList.remove('hidden');
+    loadData();
+  }else{
+    alert("Password salah");
+  }
+}
+
+/* ===== LOAD DATA ===== */
+function loadData(){
+  const d = JSON.parse(localStorage.getItem(KEY)||'[]');
+
+  total.textContent = d.length;
+  avg.textContent = d.length
+    ? Math.round(d.reduce((a,b)=>a+b.score,0)/d.length)
+    : 0;
+
+  saranCount.textContent = d.filter(x=>x.saran && x.saran.trim()).length;
+
+  tbody.innerHTML='';
+  d.forEach((x,i)=>{
+    tbody.innerHTML += `
+      <tr class="border-b">
+        <td class="p-2 text-center">${i+1}</td>
+        <td>${x.role}</td>
+        <td>${x.kelas||'-'}</td>
+        <td class="font-bold">${x.score}</td>
+        <td class="text-gray-600">${x.saran||'-'}</td>
+      </tr>`;
+  });
+}
+
+/* ===== EXPORT CSV ===== */
+function exportCSV(){
+  const d = JSON.parse(localStorage.getItem(KEY)||'[]');
+  if(!d.length){ alert('Data kosong'); return; }
+
+  let csv = "No,Status,Kelas,Skor,Saran\n";
+  d.forEach((x,i)=>{
+    csv += `${i+1},${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
+  });
+
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'hasil_survei_uks.csv';
+  a.click();
+}
+
+/* ===== CLEAR ===== */
+function clearData(){
+  if(confirm('Hapus semua data survei?')){
+    localStorage.removeItem(KEY);
+    loadData();
+  }
+}
+</script>
+
+</body>
+</html>
