@@ -230,28 +230,6 @@ function renderQ(){
 }
 </script>
 
-function nextQ(){
-  qi++;
-  qi<5?renderQ():go('feedback');
-}
-
-function submitSurvey(){
-  const total=answers.reduce((a,b)=>a+b,0);
-  const score=Math.round(total/20*100);
-  const data=load();
-  data.push({role,kelas,score});
-  save(data);
-  resetForm();
-  updateHome();
-  go('home');
-}
-
-function resetForm(){
-  document.getElementById('name').value='';
-  document.getElementById('saran').value='';
-  role=kelas='';
-}
-
 /* ===== HOME UPDATE ===== */
 function updateHome(){
   const d=load();
