@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
 body{font-family:Nunito,sans-serif}
 .hidden{display:none}
@@ -18,7 +17,6 @@ canvas{max-height:300px;}
 }
 </style>
 </head>
-
 <body class="bg-gray-100 min-h-screen p-6">
 
 <div class="max-w-6xl mx-auto">
@@ -177,7 +175,7 @@ function loadData(){
     tbody.innerHTML += `
       <tr class="border-b">
         <td class="p-2 text-center">${i+1}</td>
-        <td>${x.timestamp||'-'}</td>
+        <td>${x.timestamp || '-'}</td>
         <td>${x.nama||'-'}</td>
         <td>${x.role}</td>
         <td>${x.kelas||'-'}</td>
@@ -206,11 +204,7 @@ function renderChart(data){
         label:'Jumlah Responden',
         data: counts,
         backgroundColor: [
-          '#16a34a', // Guru - hijau
-          '#3b82f6', // Pegawai - biru
-          '#facc15', // VII - kuning
-          '#ef4444', // VIII - merah
-          '#f97316'  // IX - oranye
+          '#16a34a', '#3b82f6', '#facc15', '#ef4444', '#f97316'
         ]
       }]
     },
