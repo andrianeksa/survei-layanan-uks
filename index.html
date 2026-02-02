@@ -2,267 +2,81 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Survei Kepuasan UKS</title>
+<title>Survei UKS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
-
 <style>
-body { font-family: Nunito, sans-serif; }
-
-.option{
-  border:2px solid #e5e7eb;
-  padding:14px;
-  border-radius:16px;
-  cursor:pointer;
-  transition:.2s;
-  background:#fff;
-}
-.option:hover{ border-color:#22c55e }
-.option.active{
-  background:#dcfce7;
-  border-color:#16a34a;
-  color:#166534;
-  font-weight:700;
-  transform:scale(1.04);
-}
-.hidden{ display:none }
+body{font-family:Nunito,sans-serif}
 </style>
 </head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
 
-<body class="bg-gradient-to-br from-green-50 via-blue-50 to-lime-50 min-h-screen">
+<div class="bg-white p-8 rounded-2xl shadow-md max-w-md w-full">
+  <h2 class="text-2xl font-bold mb-4 text-green-700 text-center">📝 Survei UKS</h2>
 
-<div class="max-w-xl mx-auto p-6">
+  <input id="nama" type="text" placeholder="Nama" class="w-full p-3 border rounded mb-3">
+  
+  <select id="role" class="w-full p-3 border rounded mb-3">
+    <option value="">Pilih Status</option>
+    <option value="Siswa">Siswa</option>
+    <option value="Guru">Guru</option>
+    <option value="Pegawai">Pegawai</option>
+  </select>
 
-<!-- ================= HOME ================= -->
-<section id="home">
-  <h1 class="text-3xl font-extrabold text-center text-green-700">
-    Survei Kepuasan Layanan UKS
-  </h1>
-  <p class="text-center font-semibold text-blue-700 mb-6">
-    MTs Negeri 9 Bantul
-  </p>
+  <select id="kelas" class="w-full p-3 border rounded mb-3">
+    <option value="">Pilih Kelas</option>
+    <option value="VII">VII</option>
+    <option value="VIII">VIII</option>
+    <option value="IX">IX</option>
+  </select>
 
-  <div class="bg-white rounded-3xl shadow-xl p-6 text-center">
-    <p class="font-bold text-lg">📊 Kepuasan Layanan UKS</p>
-    <div class="text-5xl font-extrabold text-green-600 my-3">
-      <span id="avgScore">0</span>/100
-    </div>
-    <p id="statusText"
-       class="mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full">
-      Dalam proses peningkatan layanan.
-    </p>
+  <input id="score" type="number" placeholder="Skor (0-100)" class="w-full p-3 border rounded mb-3">
 
-    <div class="mt-6 text-left text-sm">
-      <p class="font-bold mb-2">👥 Responden</p>
-      <div>Guru: <span id="guru">0</span></div>
-      <div>Pegawai: <span id="pegawai">0</span></div>
-      <div>VII: <span id="vii">0</span> | VIII: <span id="viii">0</span> | IX: <span id="ix">0</span></div>
-    </div>
+  <textarea id="saran" placeholder="Saran (opsional)" class="w-full p-3 border rounded mb-3"></textarea>
 
-    <button onclick="go('form')"
-      class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
-      🏥 Mulai Survei
-    </button>
-  </div>
-</section>
+  <button onclick="submitForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700">
+    Kirim Survei
+  </button>
 
-<!-- ================= FORM ================= -->
-<section id="form" class="hidden">
-  <div class="bg-white rounded-3xl shadow-xl p-6">
-
-    <h2 class="text-xl font-extrabold text-center text-green-700 mb-6">
-      📋 Data Responden
-    </h2>
-
-    <input id="nama" placeholder="Nama (opsional)"
-      class="w-full border-2 rounded-xl p-3 mb-2">
-
-    <p class="text-xs text-gray-500 mb-4">
-      Digunakan hanya untuk dokumentasi internal madrasah.
-    </p>
-
-    <p class="font-bold mb-2">Status:</p>
-    <div id="statusGroup" class="grid grid-cols-3 gap-3 mb-6">
-      <div class="option" data-v="Guru">👨‍🏫 Guru</div>
-      <div class="option" data-v="Pegawai">👔 Pegawai</div>
-      <div class="option" data-v="Siswa">👨‍🎓 Siswa</div>
-    </div>
-
-    <div id="kelasBox" class="hidden">
-      <p class="font-bold mb-2">Kelas:</p>
-      <div id="kelasGroup" class="grid grid-cols-3 gap-3 mb-6">
-        <div class="option" data-v="VII">VII</div>
-        <div class="option" data-v="VIII">VIII</div>
-        <div class="option" data-v="IX">IX</div>
-      </div>
-    </div>
-
-    <button onclick="startSurvey()"
-      class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">
-      Lanjutkan →
-    </button>
-  </div>
-</section>
-
-<!-- ================= SURVEY ================= -->
-<section id="survey" class="hidden">
-  <div class="bg-white rounded-3xl shadow-xl p-6">
-
-    <p id="qNum" class="text-sm font-bold text-green-600"></p>
-    <h3 id="qText" class="text-lg font-extrabold mt-2 mb-4"></h3>
-
-    <div id="options" class="grid grid-cols-1 gap-3"></div>
-
-    <button id="nextBtn" onclick="nextQ()"
-      class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-40"
-      disabled>
-      Selanjutnya →
-    </button>
-  </div>
-</section>
-
-<!-- ================= SARAN ================= -->
-<section id="saran" class="hidden">
-  <div class="bg-white rounded-3xl shadow-xl p-6">
-
-    <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">
-      💬 Saran & Masukan
-    </h2>
-
-    <p class="text-sm text-gray-600 mb-3 text-center">
-      Silakan tuliskan saran untuk peningkatan layanan UKS (opsional).
-    </p>
-
-    <textarea id="saranText"
-      rows="5"
-      class="w-full border-2 rounded-xl p-3"
-      placeholder="Contoh: Ruang UKS sudah nyaman, tetapi perlu penambahan kipas angin."></textarea>
-
-    <button onclick="submitSurvey()"
-      class="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
-      Kirim Survei ✓
-    </button>
-  </div>
-</section>
-
+  <p id="msg" class="text-center mt-3 text-green-600 font-bold"></p>
 </div>
 
 <script>
-/* ===== DATA ===== */
-const questions=[
- 'Ruang UKS bersih dan nyaman',
- 'Ketersediaan obat dan alat kesehatan',
- 'Kecepatan pelayanan UKS',
- 'Keramahan petugas UKS',
- 'Manfaat layanan UKS bagi warga madrasah'
-];
+const KEY = "uks";
 
-const likert=[
- {v:25,t:'😞 Tidak Puas'},
- {v:50,t:'😐 Kurang Puas'},
- {v:75,t:'😊 Puas'},
- {v:100,t:'😄 Sangat Puas'}
-];
+function submitForm(){
+  const nama = document.getElementById('nama').value.trim();
+  const role = document.getElementById('role').value;
+  const kelas = document.getElementById('kelas').value;
+  const score = parseInt(document.getElementById('score').value);
+  const saran = document.getElementById('saran').value.trim();
 
-let nama='', role='', kelas='', qi=0, answers=[];
-
-/* ===== NAV ===== */
-function go(id){
- ['home','form','survey','saran']
-  .forEach(x=>document.getElementById(x).classList.add('hidden'));
- document.getElementById(id).classList.remove('hidden');
-}
-
-/* ===== STORAGE ===== */
-const load=()=>JSON.parse(localStorage.getItem('uks')||'[]');
-const save=d=>localStorage.setItem('uks',JSON.stringify(d));
-
-/* ===== HOME ===== */
-function updateHome(){
- const d=load(); if(!d.length)return;
- const avg=Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
- avgScore.textContent=avg;
- statusText.textContent=avg>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
- statusText.className=avg>=80?
-  'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
-  'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
-
- guru.textContent=pegawai.textContent=vii.textContent=viii.textContent=ix.textContent=0;
- d.forEach(x=>{
-  if(x.role==='Guru')guru.textContent++;
-  if(x.role==='Pegawai')pegawai.textContent++;
-  if(x.role==='Siswa'){
-    if(x.kelas==='VII')vii.textContent++;
-    if(x.kelas==='VIII')viii.textContent++;
-    if(x.kelas==='IX')ix.textContent++;
+  if(!nama || !role || !kelas || isNaN(score)){
+    alert("Harap isi semua kolom dengan benar!");
+    return;
   }
- });
-}
-updateHome();
 
-/* ===== FORM ===== */
-statusGroup.querySelectorAll('.option').forEach(b=>{
- b.onclick=()=>{
-  statusGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  role=b.dataset.v;
-  kelasBox.classList.toggle('hidden',role!=='Siswa');
- }
-});
+  let data = JSON.parse(localStorage.getItem(KEY) || '[]');
 
-kelasGroup.querySelectorAll('.option').forEach(b=>{
- b.onclick=()=>{
-  kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  kelas=b.dataset.v;
- }
-});
-
-function startSurvey(){
- nama = document.getElementById('nama').value || '-';
- if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
- qi=0; answers=[];
- go('survey'); renderQ();
-}
-
-/* ===== SURVEY ===== */
-function renderQ(){
- qNum.textContent=`Pertanyaan ${qi+1} dari ${questions.length}`;
- qText.textContent=questions[qi];
- options.innerHTML='';
- nextBtn.disabled=true;
-
- likert.forEach(l=>{
-  const d=document.createElement('div');
-  d.className='option';
-  d.textContent=l.t;
-  d.onclick=()=>{
-   options.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-   d.classList.add('active');
-   answers[qi]=l.v;
-   nextBtn.disabled=false;
+  const entry = {
+    nomor: data.length + 1,
+    timestamp: new Date().toLocaleString(), // otomatis Timestamp
+    nama,
+    role,
+    kelas,
+    score,
+    saran
   };
-  options.appendChild(d);
- });
 
- nextBtn.textContent = qi===questions.length-1 ? 'Lanjutkan →' : 'Selanjutnya →';
-}
+  data.push(entry);
+  localStorage.setItem(KEY, JSON.stringify(data));
 
-function nextQ(){
- if(qi<questions.length-1){ qi++; renderQ(); }
- else go('saran');
-}
-
-/* ===== SUBMIT ===== */
-function submitSurvey(){
- const score=Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
- const saran=document.getElementById('saranText').value;
- const d=load();
- d.push({nama, role, kelas, score, saran}); // <-- nama ditambahkan
- save(d);
- document.getElementById('saranText').value='';
- updateHome();
- go('home');
+  document.getElementById('msg').textContent = "Terima kasih! Survei berhasil dikirim.";
+  document.getElementById('nama').value = '';
+  document.getElementById('role').value = '';
+  document.getElementById('kelas').value = '';
+  document.getElementById('score').value = '';
+  document.getElementById('saran').value = '';
 }
 </script>
 
