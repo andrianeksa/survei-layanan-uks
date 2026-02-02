@@ -4,20 +4,13 @@
   <meta charset="UTF-8" />
   <title>Survei Kepuasan UKS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     * { font-family: 'Nunito', sans-serif; }
 
-    .fade-in {
-      animation: fadeIn .4s ease;
-    }
-
+    .fade-in { animation: fadeIn .4s ease; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
@@ -26,11 +19,10 @@
     .likert-option {
       transition: all .2s ease;
     }
-
     .likert-option.selected {
-      border-color: #22c55e;
-      background: #dcfce7;
-      transform: scale(1.05);
+      border-color:#4CAF50;
+      background:#e8f5e9;
+      transform:scale(1.05);
     }
   </style>
 </head>
@@ -39,119 +31,233 @@
 
 <div id="app" class="max-w-xl mx-auto p-6">
 
-  <!-- HOME -->
-  <section id="home" class="fade-in">
-    <h1 class="text-3xl font-extrabold text-center text-green-700">
-      Survei Kepuasan Layanan UKS
-    </h1>
-    <p class="text-center font-semibold text-blue-700 mt-1">
-      MTs Negeri 9 Bantul
+<!-- HOME -->
+<section id="home" class="fade-in">
+  <h1 class="text-3xl font-extrabold text-center text-green-700">
+    Survei Kepuasan Layanan UKS
+  </h1>
+  <p class="text-center font-semibold text-blue-700 mt-1">
+    MTs Negeri 9 Bantul
+  </p>
+
+  <div class="bg-white rounded-2xl shadow p-6 mt-6 text-center">
+    <h3 class="font-semibold text-green-700">📊 Kepuasan Layanan UKS Saat Ini</h3>
+    <div class="text-5xl font-extrabold text-green-700 mt-3">
+      <span id="avgScore">0</span><span class="text-gray-400 text-2xl">/100</span>
+    </div>
+    <p class="text-xs text-gray-500 mt-2">
+      Nilai rata-rata kepuasan berdasarkan survei yang telah masuk.
+    </p>
+    <p id="statusText"
+       class="mt-3 text-sm font-semibold px-3 py-2 rounded-full inline-block bg-orange-100 text-orange-700">
+      Dalam proses peningkatan layanan.
+    </p>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow p-6 mt-6">
+    <h3 class="font-semibold text-green-700 mb-2">👥 Responden</h3>
+    <div class="space-y-1 text-sm">
+      <div class="flex justify-between">Guru <span id="guru">0</span></div>
+      <div class="flex justify-between">Pegawai <span id="pegawai">0</span></div>
+      <div class="flex justify-between">Siswa Kelas VII <span id="vii">0</span></div>
+      <div class="flex justify-between">Siswa Kelas VIII <span id="viii">0</span></div>
+      <div class="flex justify-between">Siswa Kelas IX <span id="ix">0</span></div>
+    </div>
+  </div>
+
+  <button onclick="go('respondent')"
+    class="w-full mt-6 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-green-700">
+    🏥 Mulai Survei
+  </button>
+</section>
+
+<!-- RESPONDENT -->
+<section id="respondent" class="hidden fade-in">
+  <div class="bg-white rounded-2xl shadow p-6">
+    <h2 class="text-xl font-bold text-green-700 mb-4 text-center">📋 Data Responden</h2>
+
+    <input id="name" placeholder="Nama (opsional)"
+      class="w-full border-2 rounded-xl px-4 py-3 mb-2">
+    <p class="text-xs text-gray-500 mb-4">
+      Digunakan hanya untuk dokumentasi internal madrasah.
     </p>
 
-    <button onclick="goSurvey()" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
-      Mulai Survei
-    </button>
-  </section>
-
-  <!-- SURVEY -->
-  <section id="survey" class="hidden fade-in mt-6">
-
-    <h2 class="text-xl font-bold text-center mb-4">
-      Pilih jawaban yang paling sesuai
-    </h2>
-
-    <div id="questions" class="space-y-6"></div>
-
-    <button onclick="finishSurvey()" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold">
-      Selesai Survei
-    </button>
-
-  </section>
-
-  <!-- RESULT -->
-  <section id="result" class="hidden fade-in mt-6 text-center">
-
-    <h2 class="text-2xl font-extrabold text-green-700 mb-4">
-      Hasil Survei
-    </h2>
-
-    <div class="text-6xl font-black text-blue-700">
-      <span id="score">0</span><span class="text-2xl">/100</span>
+    <p class="font-semibold mb-2">Status Anda:</p>
+    <div class="grid grid-cols-3 gap-2">
+      <button onclick="setRole('Guru')" class="role btn border-2 rounded-xl py-2">👨‍🏫 Guru</button>
+      <button onclick="setRole('Pegawai')" class="role btn border-2 rounded-xl py-2">👔 Pegawai</button>
+      <button onclick="setRole('Siswa')" class="role btn border-2 rounded-xl py-2">👨‍🎓 Siswa</button>
     </div>
 
-    <p class="mt-2 font-semibold text-green-700">
-      Terima kasih atas partisipasi Anda 🙏
-    </p>
+    <div id="kelasBox" class="hidden mt-4">
+      <p class="font-semibold mb-2">Kelas:</p>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="setClass('VII')" class="kelas btn border-2 rounded-xl py-2">VII</button>
+        <button onclick="setClass('VIII')" class="kelas btn border-2 rounded-xl py-2">VIII</button>
+        <button onclick="setClass('IX')" class="kelas btn border-2 rounded-xl py-2">IX</button>
+      </div>
+    </div>
 
-    <button onclick="resetApp()" class="mt-6 w-full bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-xl font-bold">
-      Kembali ke Beranda
+    <div class="flex gap-2 mt-6">
+      <button onclick="go('home')" class="w-1/2 border-2 rounded-xl py-3">← Kembali</button>
+      <button id="nextBtn" disabled onclick="startSurvey()"
+        class="w-1/2 rounded-xl py-3 text-white bg-green-600 disabled:opacity-50">
+        Lanjutkan →
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- SURVEY -->
+<section id="survey" class="hidden fade-in">
+  <div class="bg-white rounded-2xl shadow p-6">
+    <p id="qNum" class="text-sm font-semibold text-green-700"></p>
+    <h3 id="qText" class="font-bold text-lg mt-2"></h3>
+
+    <div id="opts" class="grid grid-cols-2 gap-3 mt-4"></div>
+
+    <button id="nextQ" disabled onclick="nextQ()"
+      class="w-full mt-6 py-3 rounded-xl bg-green-600 text-white">
+      Selanjutnya →
     </button>
+  </div>
+</section>
 
-  </section>
+<!-- FEEDBACK -->
+<section id="feedback" class="hidden fade-in">
+  <div class="bg-white rounded-2xl shadow p-6">
+    <h2 class="font-bold text-green-700 text-xl mb-2 text-center">💬 Saran</h2>
+    <textarea id="saran" rows="5"
+      class="w-full border-2 rounded-xl p-3"
+      placeholder="Masukan Anda (opsional)"></textarea>
+
+    <button onclick="submitSurvey()"
+      class="w-full mt-4 py-3 rounded-xl bg-green-600 text-white font-bold">
+      Selesai Survei ✓
+    </button>
+  </div>
+</section>
 
 </div>
 
 <script>
-  const questions = [
-    "Kebersihan ruang UKS",
-    "Ketersediaan obat dan alat kesehatan",
-    "Pelayanan petugas UKS",
-    "Kenyamanan ruang UKS",
-    "Manfaat layanan UKS bagi siswa"
-  ];
+/* ===== DATA ===== */
+const questions = [
+  'Ruang UKS bersih dan nyaman digunakan',
+  'Obat dan alat kesehatan tersedia',
+  'Pelayanan UKS cepat',
+  'Petugas UKS ramah',
+  'Layanan UKS bermanfaat'
+];
+const opts = [
+  {v:1,t:'Tidak Puas 😞'},
+  {v:2,t:'Kurang Puas 😐'},
+  {v:3,t:'Puas 😊'},
+  {v:4,t:'Sangat Puas 😄'}
+];
 
-  let answers = [];
+let role='', kelas='', answers=[], qi=0;
 
-  const questionContainer = document.getElementById("questions");
+/* ===== STORAGE ===== */
+const KEY = 'surveyUKS';
+const load = () => JSON.parse(localStorage.getItem(KEY) || '[]');
+const save = d => localStorage.setItem(KEY, JSON.stringify(d));
 
-  questions.forEach((q, i) => {
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <p class="font-semibold mb-2">${i+1}. ${q}</p>
-      <div class="flex gap-2">
-        <div class="likert-option flex-1 border rounded-lg p-3 text-center cursor-pointer"
-             onclick="selectOption(this,1,${i})">😡</div>
-        <div class="likert-option flex-1 border rounded-lg p-3 text-center cursor-pointer"
-             onclick="selectOption(this,2,${i})">😐</div>
-        <div class="likert-option flex-1 border rounded-lg p-3 text-center cursor-pointer"
-             onclick="selectOption(this,3,${i})">😊</div>
-        <div class="likert-option flex-1 border rounded-lg p-3 text-center cursor-pointer"
-             onclick="selectOption(this,4,${i})">😍</div>
-      </div>
-    `;
-    questionContainer.appendChild(div);
+/* ===== UI ===== */
+const go = id => {
+  document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+};
+
+function setRole(r){
+  role=r; kelas='';
+  document.getElementById('kelasBox').classList.toggle('hidden', r!=='Siswa');
+  document.getElementById('nextBtn').disabled = r==='Siswa';
+}
+function setClass(k){
+  kelas=k;
+  document.getElementById('nextBtn').disabled=false;
+}
+
+function startSurvey(){
+  answers=[]; qi=0;
+  go('survey');
+  renderQ();
+}
+
+/* ===== HIGHLIGHT FIX (INTI PERBAIKAN) ===== */
+function renderQ(){
+  document.getElementById('qNum').textContent=`Pertanyaan ${qi+1}/5`;
+  document.getElementById('qText').textContent=questions[qi];
+
+  const o=document.getElementById('opts');
+  o.innerHTML='';
+
+  opts.forEach(x=>{
+    const b=document.createElement('button');
+    b.className='likert-option border-2 rounded-xl p-3';
+    b.textContent=x.t;
+
+    b.onclick=()=>{
+      o.querySelectorAll('.likert-option')
+        .forEach(el=>el.classList.remove('selected'));
+      b.classList.add('selected');
+      answers[qi]=x.v;
+      document.getElementById('nextQ').disabled=false;
+    };
+
+    o.appendChild(b);
   });
 
-  function goSurvey() {
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("survey").classList.remove("hidden");
-  }
+  document.getElementById('nextQ').disabled=true;
+}
 
-  function selectOption(el, value, index) {
-    const options = el.parentElement.querySelectorAll(".likert-option");
-    options.forEach(opt => opt.classList.remove("selected"));
-    el.classList.add("selected");
-    answers[index] = value;
-  }
+function nextQ(){
+  qi++;
+  qi<5?renderQ():go('feedback');
+}
 
-  function finishSurvey() {
-    if (answers.length < questions.length) {
-      alert("Silakan jawab semua pertanyaan terlebih dahulu.");
-      return;
+function submitSurvey(){
+  const total=answers.reduce((a,b)=>a+b,0);
+  const score=Math.round(total/20*100);
+  const data=load();
+  data.push({role,kelas,score});
+  save(data);
+  resetForm();
+  updateHome();
+  go('home');
+}
+
+function resetForm(){
+  document.getElementById('name').value='';
+  document.getElementById('saran').value='';
+  role=kelas='';
+}
+
+/* ===== HOME UPDATE ===== */
+function updateHome(){
+  const d=load();
+  if(!d.length)return;
+  const avg=Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
+  document.getElementById('avgScore').textContent=avg;
+  document.getElementById('statusText').textContent =
+    avg>=80?'✓ Target minimal kepuasan (80) telah tercapai.':'Dalam proses peningkatan layanan.';
+  document.getElementById('statusText').className =
+    avg>=80?'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
+             'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+
+  ['guru','pegawai','vii','viii','ix'].forEach(id=>document.getElementById(id).textContent=0);
+  d.forEach(x=>{
+    if(x.role==='Guru')guru.textContent++;
+    if(x.role==='Pegawai')pegawai.textContent++;
+    if(x.role==='Siswa'){
+      if(x.kelas==='VII')vii.textContent++;
+      if(x.kelas==='VIII')viii.textContent++;
+      if(x.kelas==='IX')ix.textContent++;
     }
-
-    const total = answers.reduce((a,b) => a + b, 0);
-    const score = Math.round((total / (questions.length * 4)) * 100);
-
-    document.getElementById("score").innerText = score;
-
-    document.getElementById("survey").classList.add("hidden");
-    document.getElementById("result").classList.remove("hidden");
-  }
-
-  function resetApp() {
-    location.reload();
-  }
+  });
+}
+updateHome();
 </script>
 
 </body>
