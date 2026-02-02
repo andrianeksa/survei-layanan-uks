@@ -232,19 +232,20 @@ function submitSurvey() {
 
   const data = {nama, role, kelas, score, saran};
 
-  fetch("https://script.google.com/macros/s/AKfycbztcXrt26aGWJlJ36SCNRkzs_8nDyYeZAhOC_3pm5yV-tQs-Cp-kuNw7uteFDvgwKFb/exec", {
-    method: "POST",
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(resp => {
-    alert("Survei berhasil dikirim!");
-    document.getElementById('saranText').value='';
-    go('home');
-  })
-  .catch(err => {
-    alert("Gagal kirim survei: " + err);
-  });
+ fetch("https://script.google.com/macros/s/AKfycbyLMqfcs5hMkDK9xz1jKWII2YuxzAzmUwAugLPOd1aeL4Pw6NRD-Zb5qP6rL75D04g/exec", {
+  method: "POST",
+  body: JSON.stringify(data)
+})
+.then(res => res.json())
+.then(resp => {
+  alert("Survei berhasil dikirim!");
+  document.getElementById('saranText').value='';
+  updateHome();
+  go('home');
+})
+.catch(err => {
+  alert("Gagal kirim survei: " + err);
+});
 }
 </script>
 
