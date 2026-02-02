@@ -186,7 +186,6 @@ function startSurvey(){
 }
 
 /* ===== HIGHLIGHT FIX (INTI PERBAIKAN) ===== */
-<script>
 function renderQ(){
   document.getElementById('qNum').textContent = `Pertanyaan ${qi+1}/5`;
   document.getElementById('qText').textContent = questions[qi];
@@ -199,18 +198,18 @@ function renderQ(){
     b.className = 'likert-option border-2 rounded-xl p-3';
     b.textContent = x.t;
 
-    // 🔹 jika sebelumnya sudah dijawab → tampilkan highlight
+    // jika soal ini sudah pernah dijawab
     if (answers[qi] === x.v) {
       b.classList.add('selected');
       document.getElementById('nextQ').disabled = false;
     }
 
     b.onclick = () => {
-      // 🔥 hapus highlight tombol lain
+      // hapus highlight opsi lain
       o.querySelectorAll('.likert-option')
         .forEach(el => el.classList.remove('selected'));
 
-      // 🔥 aktifkan highlight tombol ini
+      // aktifkan highlight opsi terpilih
       b.classList.add('selected');
 
       // simpan jawaban
@@ -223,14 +222,13 @@ function renderQ(){
     o.appendChild(b);
   });
 
-  // default: disable tombol lanjut
+  // default tombol lanjut mati
   if (!answers[qi]) {
     document.getElementById('nextQ').disabled = true;
   }
 }
-</script>
 
-/* ===== HOME UPDATE ===== */
+  /* ===== HOME UPDATE ===== */
 function updateHome(){
   const d=load();
   if(!d.length)return;
