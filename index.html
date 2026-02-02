@@ -5,54 +5,49 @@
 <title>Survei Kepuasan UKS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Firebase SDK -->
-<script type="module">
-  // Import Firebase modules
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.15.0/firebase-app.js";
-  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.15.0/firebase-database.js";
-
-  // ===== GANTI dengan firebaseConfig projectmu =====
-  const firebaseConfig = {
-    apiKey: "API_KEY",
-    authDomain: "PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "PROJECT_ID",
-    storageBucket: "PROJECT_ID.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-
-  // Buat global akses db di window
-  window.db = db;
-  window.ref = ref;
-  window.push = push;
-  window.onValue = onValue;
-</script>
 
 <style>
-body { font-family: Nunito,sans-serif; }
-.option{border:2px solid #e5e7eb;padding:14px;border-radius:16px;cursor:pointer;transition:.2s;background:#fff}
-.option:hover{border-color:#22c55e}
-.option.active{background:#dcfce7;border-color:#16a34a;color:#166534;font-weight:700;transform:scale(1.04);}
-.hidden{display:none}
+body { font-family: Nunito, sans-serif; }
+.option{
+  border:2px solid #e5e7eb;
+  padding:14px;
+  border-radius:16px;
+  cursor:pointer;
+  transition:.2s;
+  background:#fff;
+}
+.option:hover{ border-color:#22c55e }
+.option.active{
+  background:#dcfce7;
+  border-color:#16a34a;
+  color:#166534;
+  font-weight:700;
+  transform:scale(1.04);
+}
+.hidden{ display:none }
 </style>
 </head>
 
 <body class="bg-gradient-to-br from-green-50 via-blue-50 to-lime-50 min-h-screen">
+
 <div class="max-w-xl mx-auto p-6">
 
 <!-- ================= HOME ================= -->
 <section id="home">
-  <h1 class="text-3xl font-extrabold text-center text-green-700">Survei Kepuasan Layanan UKS</h1>
-  <p class="text-center font-semibold text-blue-700 mb-6">MTs Negeri 9 Bantul</p>
+  <h1 class="text-3xl font-extrabold text-center text-green-700">
+    Survei Kepuasan Layanan UKS
+  </h1>
+  <p class="text-center font-semibold text-blue-700 mb-6">
+    MTs Negeri 9 Bantul
+  </p>
 
   <div class="bg-white rounded-3xl shadow-xl p-6 text-center">
     <p class="font-bold text-lg">📊 Kepuasan Layanan UKS</p>
-    <div class="text-5xl font-extrabold text-green-600 my-3"><span id="avgScore">0</span>/100</div>
-    <p id="statusText" class="mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full">
+    <div class="text-5xl font-extrabold text-green-600 my-3">
+      <span id="avgScore">0</span>/100
+    </div>
+    <p id="statusText"
+       class="mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full">
       Dalam proses peningkatan layanan.
     </p>
 
@@ -63,7 +58,8 @@ body { font-family: Nunito,sans-serif; }
       <div>VII: <span id="vii">0</span> | VIII: <span id="viii">0</span> | IX: <span id="ix">0</span></div>
     </div>
 
-    <button onclick="go('form')" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+    <button onclick="go('form')"
+      class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
       🏥 Mulai Survei
     </button>
   </div>
@@ -73,10 +69,16 @@ body { font-family: Nunito,sans-serif; }
 <section id="form" class="hidden">
   <div class="bg-white rounded-3xl shadow-xl p-6">
 
-    <h2 class="text-xl font-extrabold text-center text-green-700 mb-6">📋 Data Responden</h2>
+    <h2 class="text-xl font-extrabold text-center text-green-700 mb-6">
+      📋 Data Responden
+    </h2>
 
-    <input id="nama" placeholder="Nama (opsional)" class="w-full border-2 rounded-xl p-3 mb-2">
-    <p class="text-xs text-gray-500 mb-4">Digunakan hanya untuk dokumentasi internal madrasah.</p>
+    <input id="nama" placeholder="Nama (opsional)"
+      class="w-full border-2 rounded-xl p-3 mb-2">
+
+    <p class="text-xs text-gray-500 mb-4">
+      Digunakan hanya untuk dokumentasi internal madrasah.
+    </p>
 
     <p class="font-bold mb-2">Status:</p>
     <div id="statusGroup" class="grid grid-cols-3 gap-3 mb-6">
@@ -94,34 +96,76 @@ body { font-family: Nunito,sans-serif; }
       </div>
     </div>
 
-    <button onclick="startSurvey()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">Lanjutkan →</button>
+    <button onclick="startSurvey()"
+      class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">
+      Lanjutkan →
+    </button>
   </div>
 </section>
 
 <!-- ================= SURVEY ================= -->
 <section id="survey" class="hidden">
   <div class="bg-white rounded-3xl shadow-xl p-6">
+
     <p id="qNum" class="text-sm font-bold text-green-600"></p>
     <h3 id="qText" class="text-lg font-extrabold mt-2 mb-4"></h3>
+
     <div id="options" class="grid grid-cols-1 gap-3"></div>
-    <button id="nextBtn" onclick="nextQ()" class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-40" disabled>Selanjutnya →</button>
+
+    <button id="nextBtn" onclick="nextQ()"
+      class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-40"
+      disabled>
+      Selanjutnya →
+    </button>
   </div>
 </section>
 
 <!-- ================= SARAN ================= -->
 <section id="saran" class="hidden">
   <div class="bg-white rounded-3xl shadow-xl p-6">
-    <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">💬 Saran & Masukan</h2>
-    <p class="text-sm text-gray-600 mb-3 text-center">Silakan tuliskan saran untuk peningkatan layanan UKS (opsional).</p>
-    <textarea id="saranText" rows="5" class="w-full border-2 rounded-xl p-3" placeholder="Contoh: Ruang UKS sudah nyaman, tetapi perlu penambahan kipas angin."></textarea>
-    <button onclick="submitSurvey()" class="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">Kirim Survei ✓</button>
+
+    <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">
+      💬 Saran & Masukan
+    </h2>
+
+    <p class="text-sm text-gray-600 mb-3 text-center">
+      Silakan tuliskan saran untuk peningkatan layanan UKS (opsional).
+    </p>
+
+    <textarea id="saranText"
+      rows="5"
+      class="w-full border-2 rounded-xl p-3"
+      placeholder="Contoh: Ruang UKS sudah nyaman, tetapi perlu penambahan kipas angin."></textarea>
+
+    <button onclick="submitSurvey()"
+      class="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+      Kirim Survei ✓
+    </button>
   </div>
 </section>
 
 </div>
 
+<!-- ===== FIREBASE UMD ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.15.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.15.0/firebase-database.js"></script>
+
 <script>
-// ===== DATA =====
+/* ===== FIREBASE CONFIG ===== */
+const firebaseConfig = {
+  apiKey: "API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ===== DATA SURVEI ===== */
 const questions=[
  'Ruang UKS bersih dan nyaman',
  'Ketersediaan obat dan alat kesehatan',
@@ -129,6 +173,7 @@ const questions=[
  'Keramahan petugas UKS',
  'Manfaat layanan UKS bagi warga madrasah'
 ];
+
 const likert=[
  {v:25,t:'😞 Tidak Puas'},
  {v:50,t:'😐 Kurang Puas'},
@@ -138,39 +183,45 @@ const likert=[
 
 let nama='', role='', kelas='', qi=0, answers=[];
 
-// ===== NAV =====
+/* ===== NAV ===== */
 function go(id){
  ['home','form','survey','saran'].forEach(x=>document.getElementById(x).classList.add('hidden'));
  document.getElementById(id).classList.remove('hidden');
 }
 
-// ===== HOME UPDATE =====
+/* ===== HOME ===== */
 function updateHome(){
- const dRef = ref(db,'survei');
- onValue(dRef,(snap)=>{
-   const data = snap.val() ? Object.values(snap.val()) : [];
-   if(!data.length) return;
-   const avg = Math.round(data.reduce((a,b)=>a+b.score,0)/data.length);
-   document.getElementById('avgScore').textContent=avg;
-   const statusText = document.getElementById('statusText');
-   statusText.textContent = avg>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
-   statusText.className = avg>=80?'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
-   // Reset counters
-   ['guru','pegawai','vii','viii','ix'].forEach(id=>document.getElementById(id).textContent=0);
-   data.forEach(x=>{
-     if(x.role==='Guru') document.getElementById('guru').textContent++;
-     if(x.role==='Pegawai') document.getElementById('pegawai').textContent++;
-     if(x.role==='Siswa'){
-       if(x.kelas==='VII') document.getElementById('vii').textContent++;
-       if(x.kelas==='VIII') document.getElementById('viii').textContent++;
-       if(x.kelas==='IX') document.getElementById('ix').textContent++;
-     }
-   });
- });
+  db.ref('survei').once('value',snap=>{
+    const d = snap.val();
+    if(!d) return;
+    const arr = Object.values(d);
+    const avgScoreVal = Math.round(arr.reduce((a,b)=>a+b.score,0)/arr.length);
+    document.getElementById('avgScore').textContent = avgScoreVal;
+    document.getElementById('statusText').textContent = avgScoreVal>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
+    document.getElementById('statusText').className = avgScoreVal>=80?
+      'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
+      'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+
+    document.getElementById('guru').textContent=0;
+    document.getElementById('pegawai').textContent=0;
+    document.getElementById('vii').textContent=0;
+    document.getElementById('viii').textContent=0;
+    document.getElementById('ix').textContent=0;
+
+    arr.forEach(x=>{
+      if(x.role==='Guru') document.getElementById('guru').textContent++;
+      if(x.role==='Pegawai') document.getElementById('pegawai').textContent++;
+      if(x.role==='Siswa'){
+        if(x.kelas==='VII') document.getElementById('vii').textContent++;
+        if(x.kelas==='VIII') document.getElementById('viii').textContent++;
+        if(x.kelas==='IX') document.getElementById('ix').textContent++;
+      }
+    });
+  });
 }
 updateHome();
 
-// ===== FORM LOGIC =====
+/* ===== FORM ===== */
 const statusGroup = document.getElementById('statusGroup');
 const kelasGroup = document.getElementById('kelasGroup');
 const kelasBox = document.getElementById('kelasBox');
@@ -180,9 +231,12 @@ statusGroup.querySelectorAll('.option').forEach(b=>{
     statusGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     role=b.dataset.v;
-    kelasBox.classList.toggle('hidden',role!=='Siswa');
+    kelasBox.classList.toggle('hidden', role!=='Siswa');
+    if(role!=='Siswa') kelas='';
+    kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
   }
 });
+
 kelasGroup.querySelectorAll('.option').forEach(b=>{
   b.onclick=()=>{
     kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
@@ -192,46 +246,63 @@ kelasGroup.querySelectorAll('.option').forEach(b=>{
 });
 
 function startSurvey(){
- nama = document.getElementById('nama').value || '-';
- if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
- qi=0; answers=[];
- go('survey'); renderQ();
+  nama=document.getElementById('nama').value || '-';
+  if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
+  qi=0; answers=[];
+  go('survey'); renderQ();
 }
 
-// ===== SURVEY LOGIC =====
-const qNum = document.getElementById('qNum');
-const qText = document.getElementById('qText');
-const optionsDiv = document.getElementById('options');
-const nextBtn = document.getElementById('nextBtn');
-
+/* ===== SURVEY ===== */
 function renderQ(){
- qNum.textContent=`Pertanyaan ${qi+1} dari ${questions.length}`;
- qText.textContent=questions[qi];
- optionsDiv.innerHTML=''; nextBtn.disabled=true;
- likert.forEach(l=>{
-   const d=document.createElement('div');
-   d.className='option'; d.textContent=l.t;
-   d.onclick=()=>{
-     optionsDiv.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-     d.classList.add('active'); answers[qi]=l.v; nextBtn.disabled=false;
-   };
-   optionsDiv.appendChild(d);
- });
- nextBtn.textContent = qi===questions.length-1?'Lanjutkan →':'Selanjutnya →';
+  document.getElementById('qNum').textContent = `Pertanyaan ${qi+1} dari ${questions.length}`;
+  document.getElementById('qText').textContent = questions[qi];
+  const optionsDiv = document.getElementById('options');
+  const nextBtn = document.getElementById('nextBtn');
+  optionsDiv.innerHTML='';
+  nextBtn.disabled=true;
+
+  likert.forEach(l=>{
+    const d=document.createElement('div');
+    d.className='option';
+    d.textContent=l.t;
+    d.onclick=()=>{
+      optionsDiv.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+      d.classList.add('active');
+      answers[qi]=l.v;
+      nextBtn.disabled=false;
+    };
+    optionsDiv.appendChild(d);
+  });
+
+  nextBtn.textContent = qi===questions.length-1?'Lanjutkan →':'Selanjutnya →';
 }
 
-function nextQ(){ if(qi<questions.length-1){ qi++; renderQ(); } else go('saran'); }
+function nextQ(){
+  if(qi<questions.length-1){ qi++; renderQ(); }
+  else go('saran');
+}
 
-// ===== SUBMIT SURVEY =====
+/* ===== SUBMIT ===== */
 function submitSurvey(){
- const score = Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
- const saran = document.getElementById('saranText').value;
- push(ref(db,'survei'),{
-   nama, role, kelas, score, saran,
-   timestamp: new Date().toLocaleString()
- });
- document.getElementById('saranText').value=''; updateHome(); go('home');
+  const score=Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
+  const saran=document.getElementById('saranText').value;
+
+  const data = {
+    nama, role, kelas, score, saran,
+    timestamp: new Date().toLocaleString()
+  };
+
+  firebase.database().ref('survei').push(data, err=>{
+    if(err) alert('Gagal mengirim survei');
+    else{
+      alert('Survei berhasil dikirim ✅');
+      document.getElementById('saranText').value='';
+      updateHome();
+      go('home');
+    }
+  });
 }
 </script>
+
 </body>
 </html>
