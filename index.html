@@ -2,10 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Survei Kepuasan UKS</title>
+<title>Survei Layanan UKS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
-
 <style>
 body { font-family: Nunito, sans-serif; }
 .option{
@@ -25,57 +24,42 @@ body { font-family: Nunito, sans-serif; }
   transform:scale(1.04);
 }
 .hidden{ display:none }
+.disabled { opacity:0.4; cursor:not-allowed }
 </style>
 </head>
-
 <body class="bg-gradient-to-br from-green-50 via-blue-50 to-lime-50 min-h-screen">
 <div class="max-w-xl mx-auto p-6">
 
-<!-- ================= HOME ================= -->
+<!-- HOME -->
 <section id="home">
-  <h1 class="text-3xl font-extrabold text-center text-green-700">
-    Survei Kepuasan Layanan UKS
-  </h1>
-  <p class="text-center font-semibold text-blue-700 mb-6">
-    MTs Negeri 9 Bantul
-  </p>
-
+  <h1 class="text-3xl font-extrabold text-center text-green-700">Survei Kepuasan Layanan UKS</h1>
+  <p class="text-center font-semibold text-blue-700 mb-6">MTs Negeri 9 Bantul</p>
   <div class="bg-white rounded-3xl shadow-xl p-6 text-center">
     <p class="font-bold text-lg">📊 Kepuasan Layanan UKS</p>
-    <div class="text-5xl font-extrabold text-green-600 my-3">
-      <span id="avgScore">0</span>/100
-    </div>
-    <p id="statusText" class="mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full">
-      Dalam proses peningkatan layanan.
-    </p>
-
+    <div class="text-5xl font-extrabold text-green-600 my-3"><span id="avgScore">0</span>/100</div>
+    <p id="statusText" class="mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full">Dalam proses peningkatan layanan.</p>
     <div class="mt-6 text-left text-sm">
       <p class="font-bold mb-2">👥 Responden</p>
       <div>Guru: <span id="guru">0</span></div>
       <div>Pegawai: <span id="pegawai">0</span></div>
       <div>VII: <span id="vii">0</span> | VIII: <span id="viii">0</span> | IX: <span id="ix">0</span></div>
     </div>
-
-    <button onclick="go('form')" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
-      🏥 Mulai Survei
-    </button>
+    <button onclick="go('form')" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">🏥 Mulai Survei</button>
   </div>
 </section>
 
-<!-- ================= FORM ================= -->
+<!-- FORM -->
 <section id="form" class="hidden">
   <div class="bg-white rounded-3xl shadow-xl p-6">
     <h2 class="text-xl font-extrabold text-center text-green-700 mb-6">📋 Data Responden</h2>
     <input id="nama" placeholder="Nama (opsional)" class="w-full border-2 rounded-xl p-3 mb-2">
     <p class="text-xs text-gray-500 mb-4">Digunakan hanya untuk dokumentasi internal madrasah.</p>
-
     <p class="font-bold mb-2">Status:</p>
     <div id="statusGroup" class="grid grid-cols-3 gap-3 mb-6">
       <div class="option" data-v="Guru">👨‍🏫 Guru</div>
       <div class="option" data-v="Pegawai">👔 Pegawai</div>
       <div class="option" data-v="Siswa">👨‍🎓 Siswa</div>
     </div>
-
     <div id="kelasBox" class="hidden">
       <p class="font-bold mb-2">Kelas:</p>
       <div id="kelasGroup" class="grid grid-cols-3 gap-3 mb-6">
@@ -84,44 +68,35 @@ body { font-family: Nunito, sans-serif; }
         <div class="option" data-v="IX">IX</div>
       </div>
     </div>
-
-    <button onclick="startSurvey()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">
-      Lanjutkan →
-    </button>
+    <button onclick="startSurvey()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">Lanjutkan →</button>
   </div>
 </section>
 
-<!-- ================= SURVEY ================= -->
+<!-- SURVEY -->
 <section id="survey" class="hidden">
   <div class="bg-white rounded-3xl shadow-xl p-6">
     <p id="qNum" class="text-sm font-bold text-green-600"></p>
     <h3 id="qText" class="text-lg font-extrabold mt-2 mb-4"></h3>
     <div id="options" class="grid grid-cols-1 gap-3"></div>
-    <button id="nextBtn" onclick="nextQ()" class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-40" disabled>
-      Selanjutnya →
-    </button>
+    <button id="nextBtn" onclick="nextQ()" class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled" disabled>Selanjutnya →</button>
   </div>
 </section>
 
-<!-- ================= SARAN ================= -->
+<!-- SARAN -->
 <section id="saran" class="hidden">
   <div class="bg-white rounded-3xl shadow-xl p-6">
     <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">💬 Saran & Masukan</h2>
-    <p class="text-sm text-gray-600 mb-3 text-center">
-      Silakan tuliskan saran untuk peningkatan layanan UKS (opsional).
-    </p>
     <textarea id="saranText" rows="5" class="w-full border-2 rounded-xl p-3"
       placeholder="Contoh: Ruang UKS sudah nyaman, tetapi perlu penambahan kipas angin."></textarea>
-    <button onclick="submitSurvey()" class="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
-      Kirim Survei ✓
-    </button>
+    <button onclick="submitSurvey()" class="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">Kirim Survei ✓</button>
   </div>
 </section>
 
 </div>
 
 <script>
-/* ===== DATA ===== */
+const scriptURL = "https://script.google.com/macros/s/AKfycbw-_9QX8UGAOiBaQivyJ8QUW2RFih9eOwi7phk0WrFe0dasoOaumr-mUbBwPLpkGwg1/exec";
+
 const questions=[
  'Ruang UKS bersih dan nyaman',
  'Ketersediaan obat dan alat kesehatan',
@@ -139,25 +114,24 @@ const likert=[
 
 let nama='', role='', kelas='', qi=0, answers=[];
 
-/* ===== NAV ===== */
 function go(id){
  ['home','form','survey','saran'].forEach(x=>document.getElementById(x).classList.add('hidden'));
  document.getElementById(id).classList.remove('hidden');
+ window.scrollTo({top:0, behavior:'smooth'});
 }
 
-/* ===== FORM SELECTION ===== */
-statusGroup.querySelectorAll('.option').forEach(b=>{
+// Form selection
+document.querySelectorAll('#statusGroup .option').forEach(b=>{
  b.onclick=()=>{
-   statusGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+   document.querySelectorAll('#statusGroup .option').forEach(x=>x.classList.remove('active'));
    b.classList.add('active');
    role=b.dataset.v;
-   kelasBox.classList.toggle('hidden',role!=='Siswa');
+   document.getElementById('kelasBox').classList.toggle('hidden', role!=='Siswa');
  };
 });
-
-kelasGroup.querySelectorAll('.option').forEach(b=>{
+document.querySelectorAll('#kelasGroup .option').forEach(b=>{
  b.onclick=()=>{
-   kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+   document.querySelectorAll('#kelasGroup .option').forEach(x=>x.classList.remove('active'));
    b.classList.add('active');
    kelas=b.dataset.v;
  };
@@ -165,32 +139,34 @@ kelasGroup.querySelectorAll('.option').forEach(b=>{
 
 function startSurvey(){
  nama = document.getElementById('nama').value || '-';
- if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
- qi=0; answers=[];
- go('survey'); renderQ();
+ if(!role || (role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
+ qi=0; answers=[]; go('survey'); renderQ();
 }
 
-/* ===== SURVEY ===== */
+// Survey
 function renderQ(){
- qNum.textContent=`Pertanyaan ${qi+1} dari ${questions.length}`;
- qText.textContent=questions[qi];
- options.innerHTML='';
- nextBtn.disabled=true;
+ document.getElementById('qNum').textContent=`Pertanyaan ${qi+1} dari ${questions.length}`;
+ document.getElementById('qText').textContent=questions[qi];
+ const optionsDiv=document.getElementById('options');
+ optionsDiv.innerHTML='';
+ document.getElementById('nextBtn').disabled=true;
+ document.getElementById('nextBtn').classList.add('disabled');
 
  likert.forEach(l=>{
    const d=document.createElement('div');
    d.className='option';
    d.textContent=l.t;
    d.onclick=()=>{
-     options.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+     optionsDiv.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
      d.classList.add('active');
      answers[qi]=l.v;
-     nextBtn.disabled=false;
+     document.getElementById('nextBtn').disabled=false;
+     document.getElementById('nextBtn').classList.remove('disabled');
    };
-   options.appendChild(d);
+   optionsDiv.appendChild(d);
  });
 
- nextBtn.textContent = qi===questions.length-1 ? 'Lanjutkan →' : 'Selanjutnya →';
+ document.getElementById('nextBtn').textContent = qi===questions.length-1 ? 'Selesai →' : 'Selanjutnya →';
 }
 
 function nextQ(){
@@ -198,67 +174,70 @@ function nextQ(){
  else go('saran');
 }
 
-/* ===== SUBMIT KE GOOGLE SHEET ===== */
-function submitSurvey() {
-  const score = Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
-  const saran = document.getElementById('saranText').value;
+// Submit
+function submitSurvey(){
+ const score = Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
+ const saran = document.getElementById('saranText').value;
 
-  const data = {
-    nama,
-    role,
-    kelas,
-    score,
-    saran
-  };
+ const data = {nama, role, kelas, score, saran};
 
-  fetch("https://script.google.com/macros/s/AKfycby-sPxhO1dMXRqQ8UHMipUQyLS_brGrYZf8PT1kAEWoRfKSNzL2XFcb1T56gBrJ5kM/exec", {
-    method: "POST",
-    mode: "cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(resp => {
-    if(resp.status === 'ok'){
-      alert("Survei berhasil dikirim!");
-      document.getElementById('saranText').value='';
-      updateHome();
-      go('home');
-    } else {
-      alert("Gagal kirim survei: " + resp.message);
-    }
-  })
-  .catch(err => {
-    alert("Gagal kirim survei: " + err);
-  });
+ // Simpan lokal
+ const d = JSON.parse(localStorage.getItem('uks')||'[]');
+ d.push(data);
+ localStorage.setItem('uks', JSON.stringify(d));
+
+ // Kirim ke Apps Script
+ fetch(scriptURL, {
+   method: "POST",
+   headers: { "Content-Type": "text/plain;charset=utf-8" },
+   body: JSON.stringify(data)
+ })
+ .then(res=>res.json())
+ .then(resp=>{
+   if(resp.status==='ok'){
+     alert("Survei berhasil dikirim!");
+     document.getElementById('saranText').value='';
+     updateHome();
+     go('home');
+   } else alert("Gagal kirim survei: "+resp.message);
+ })
+ .catch(err=>{
+   alert("Gagal kirim survei: "+err);
+ });
+
 }
 
-/* ===== LOCAL UPDATE HOME ===== */
-function load(){return JSON.parse(localStorage.getItem('uks')||'[]');}
-function save(d){localStorage.setItem('uks',JSON.stringify(d));}
-
+// Update Home
 function updateHome(){
- const d = load(); if(!d.length) return;
- const avg = Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
- avgScore.textContent = avg;
- statusText.textContent = avg>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
- statusText.className = avg>=80?
+ const d = JSON.parse(localStorage.getItem('uks')||'[]');
+ if(!d.length) return;
+
+ let avg = Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
+ document.getElementById('avgScore').textContent = avg;
+ document.getElementById('statusText').textContent = avg>=80 ? '✓ Target kepuasan tercapai' : 'Dalam proses peningkatan layanan';
+ document.getElementById('statusText').className = avg>=80 ?
    'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full' :
    'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
 
- guru.textContent=pegawai.textContent=vii.textContent=viii.textContent=ix.textContent=0;
+ let guru=0, pegawai=0, vii=0, viii=0, ix=0;
  d.forEach(x=>{
-   if(x.role==='Guru') guru.textContent++;
-   if(x.role==='Pegawai') pegawai.textContent++;
+   if(x.role==='Guru') guru++;
+   if(x.role==='Pegawai') pegawai++;
    if(x.role==='Siswa'){
-     if(x.kelas==='VII') vii.textContent++;
-     if(x.kelas==='VIII') viii.textContent++;
-     if(x.kelas==='IX') ix.textContent++;
+     if(x.kelas==='VII') vii++;
+     if(x.kelas==='VIII') viii++;
+     if(x.kelas==='IX') ix++;
    }
  });
+ document.getElementById('guru').textContent = guru;
+ document.getElementById('pegawai').textContent = pegawai;
+ document.getElementById('vii').textContent = vii;
+ document.getElementById('viii').textContent = viii;
+ document.getElementById('ix').textContent = ix;
 }
+
+// Load stats on start
 updateHome();
 </script>
-
 </body>
 </html>
