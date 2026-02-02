@@ -2,351 +2,280 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Survei UKS Terpadu</title>
+<title>Survei Kepuasan UKS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-body{font-family:Nunito,sans-serif}
-.hidden{display:none}
-canvas{max-height:300px;}
-@media print {
-  body * {visibility:hidden;}
-  #printArea, #printArea * {visibility:visible;}
-  #printArea {position:absolute; top:0; left:0; width:100%;}
+body { font-family: Nunito, sans-serif; }
+
+.option{
+  border:2px solid #e5e7eb;
+  padding:14px;
+  border-radius:16px;
+  cursor:pointer;
+  transition:.2s;
+  background:#fff;
 }
+.option:hover{ border-color:#22c55e }
+.option.active{
+  background:#dcfce7;
+  border-color:#16a34a;
+  color:#166534;
+  font-weight:700;
+  transform:scale(1.04);
+}
+.hidden{ display:none }
 </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-6">
 
-<div class="max-w-6xl mx-auto">
+<body class="bg-gradient-to-br from-green-50 via-blue-50 to-lime-50 min-h-screen">
 
-<!-- LOGIN -->
-<section id="loginBox" class="bg-white rounded-2xl shadow p-6 max-w-md mx-auto">
-  <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">
-    🔐 Login Survei UKS
-  </h2>
+<div class="max-w-xl mx-auto p-6">
 
-  <input id="pass" type="password" placeholder="Password (Admin: uks9bantul / Responden kosong)"
-         class="w-full border-2 rounded-xl p-3 mb-4">
+<!-- ================= HOME ================= -->
+<section id="home">
+  <h1 class="text-3xl font-extrabold text-center text-green-700">
+    Survei Kepuasan Layanan UKS
+  </h1>
+  <p class="text-center font-semibold text-blue-700 mb-6">
+    MTs Negeri 9 Bantul
+  </p>
 
-  <button onclick="login()"
-          class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
-    Masuk
-  </button>
-</section>
+  <div class="bg-white rounded-3xl shadow-xl p-6 text-center">
+    <p class="font-bold text-lg">📊 Kepuasan Layanan UKS</p>
+    <div class="text-5xl font-extrabold text-green-600 my-3">
+      <span id="avgScore">0</span>/100
+    </div>
+    <p id="statusText"
+       class="mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full">
+      Dalam proses peningkatan layanan.
+    </p>
 
-<!-- SURVEI / RESPONDEN -->
-<section id="surveyBox" class="hidden">
-  <div class="bg-white p-8 rounded-2xl shadow-md max-w-md mx-auto">
-    <h2 class="text-2xl font-bold mb-4 text-green-700 text-center">📝 Survei UKS</h2>
+    <div class="mt-6 text-left text-sm">
+      <p class="font-bold mb-2">👥 Responden</p>
+      <div>Guru: <span id="guru">0</span></div>
+      <div>Pegawai: <span id="pegawai">0</span></div>
+      <div>VII: <span id="vii">0</span> | VIII: <span id="viii">0</span> | IX: <span id="ix">0</span></div>
+    </div>
 
-    <input id="nama" type="text" placeholder="Nama" class="w-full p-3 border rounded mb-3">
-    
-    <select id="role" class="w-full p-3 border rounded mb-3">
-      <option value="">Pilih Status</option>
-      <option value="Siswa">Siswa</option>
-      <option value="Guru">Guru</option>
-      <option value="Pegawai">Pegawai</option>
-    </select>
-
-    <select id="kelas" class="w-full p-3 border rounded mb-3">
-      <option value="">Pilih Kelas</option>
-      <option value="VII">VII</option>
-      <option value="VIII">VIII</option>
-      <option value="IX">IX</option>
-    </select>
-
-    <input id="score" type="number" placeholder="Skor (0-100)" class="w-full p-3 border rounded mb-3">
-
-    <textarea id="saran" placeholder="Saran (opsional)" class="w-full p-3 border rounded mb-3"></textarea>
-
-    <button onclick="submitForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700">
-      Kirim Survei
+    <button onclick="go('form')"
+      class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+      🏥 Mulai Survei
     </button>
-
-    <p id="msg" class="text-center mt-3 text-green-600 font-bold"></p>
   </div>
 </section>
 
-<!-- ADMIN PANEL -->
-<section id="adminPanel" class="hidden">
+<!-- ================= FORM ================= -->
+<section id="form" class="hidden">
+  <div class="bg-white rounded-3xl shadow-xl p-6">
 
-  <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-    <h1 class="text-3xl font-extrabold text-green-700 mb-2">
-      📊 Dashboard Admin UKS
-    </h1>
-    <div class="flex gap-2 flex-wrap">
-      <button onclick="toggleFullScreen()"
-        class="bg-purple-600 text-white px-4 py-2 rounded-xl font-bold">
-        🖥 Mode Presentasi
-      </button>
-      <button onclick="window.print()"
-        class="bg-gray-700 text-white px-4 py-2 rounded-xl font-bold">
-        🖨 Print Laporan
-      </button>
+    <h2 class="text-xl font-extrabold text-center text-green-700 mb-6">
+      📋 Data Responden
+    </h2>
+
+    <input id="nama" placeholder="Nama (opsional)"
+      class="w-full border-2 rounded-xl p-3 mb-2">
+
+    <p class="text-xs text-gray-500 mb-4">
+      Digunakan hanya untuk dokumentasi internal madrasah.
+    </p>
+
+    <p class="font-bold mb-2">Status:</p>
+    <div id="statusGroup" class="grid grid-cols-3 gap-3 mb-6">
+      <div class="option" data-v="Guru">👨‍🏫 Guru</div>
+      <div class="option" data-v="Pegawai">👔 Pegawai</div>
+      <div class="option" data-v="Siswa">👨‍🎓 Siswa</div>
     </div>
-  </div>
 
-  <!-- Ringkasan -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div class="bg-white p-4 rounded-xl shadow">
-      <p class="text-sm text-gray-500">Total Responden</p>
-      <p id="total" class="text-3xl font-bold text-green-600">0</p>
+    <div id="kelasBox" class="hidden">
+      <p class="font-bold mb-2">Kelas:</p>
+      <div id="kelasGroup" class="grid grid-cols-3 gap-3 mb-6">
+        <div class="option" data-v="VII">VII</div>
+        <div class="option" data-v="VIII">VIII</div>
+        <div class="option" data-v="IX">IX</div>
+      </div>
     </div>
-    <div class="bg-white p-4 rounded-xl shadow">
-      <p class="text-sm text-gray-500">Rata-rata Skor</p>
-      <p id="avg" class="text-3xl font-bold text-blue-600">0</p>
-    </div>
-    <div class="bg-white p-4 rounded-xl shadow">
-      <p class="text-sm text-gray-500">Jumlah Saran</p>
-      <p id="saranCount" class="text-3xl font-bold text-orange-600">0</p>
-    </div>
-  </div>
 
-  <!-- Filter -->
-  <div class="flex gap-3 mb-4 flex-wrap">
-    <select id="filterStatus" class="border p-2 rounded">
-      <option value="">Semua Status</option>
-      <option value="Guru">Guru</option>
-      <option value="Pegawai">Pegawai</option>
-      <option value="Siswa">Siswa</option>
-    </select>
-
-    <select id="filterKelas" class="border p-2 rounded">
-      <option value="">Semua Kelas</option>
-      <option value="VII">VII</option>
-      <option value="VIII">VIII</option>
-      <option value="IX">IX</option>
-    </select>
-
-    <button onclick="exportCSV()"
-      class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold">
-      ⬇ Export Excel
-    </button>
-    <button onclick="clearData()"
-      class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold">
-      🗑 Hapus Semua Data
+    <button onclick="startSurvey()"
+      class="w-full bg-green-600 text-white py-3 rounded-xl font-bold">
+      Lanjutkan →
     </button>
   </div>
+</section>
 
-  <!-- Chart -->
-  <canvas id="chartResponden" class="mb-6"></canvas>
+<!-- ================= SURVEY ================= -->
+<section id="survey" class="hidden">
+  <div class="bg-white rounded-3xl shadow-xl p-6">
 
-  <!-- Tabel -->
-  <div id="printArea" class="bg-white rounded-2xl shadow overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="bg-green-600 text-white">
-        <tr>
-          <th class="p-2">No</th>
-          <th>Timestamp</th>
-          <th>Nama</th>
-          <th>Status</th>
-          <th>Kelas</th>
-          <th>Skor</th>
-          <th>Saran</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+    <p id="qNum" class="text-sm font-bold text-green-600"></p>
+    <h3 id="qText" class="text-lg font-extrabold mt-2 mb-4"></h3>
+
+    <div id="options" class="grid grid-cols-1 gap-3"></div>
+
+    <button id="nextBtn" onclick="nextQ()"
+      class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold disabled:opacity-40"
+      disabled>
+      Selanjutnya →
+    </button>
   </div>
+</section>
 
+<!-- ================= SARAN ================= -->
+<section id="saran" class="hidden">
+  <div class="bg-white rounded-3xl shadow-xl p-6">
+
+    <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">
+      💬 Saran & Masukan
+    </h2>
+
+    <p class="text-sm text-gray-600 mb-3 text-center">
+      Silakan tuliskan saran untuk peningkatan layanan UKS (opsional).
+    </p>
+
+    <textarea id="saranText"
+      rows="5"
+      class="w-full border-2 rounded-xl p-3"
+      placeholder="Contoh: Ruang UKS sudah nyaman, tetapi perlu penambahan kipas angin."></textarea>
+
+    <button onclick="submitSurvey()"
+      class="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+      Kirim Survei ✓
+    </button>
+  </div>
 </section>
 
 </div>
 
 <script>
-/* ===== VARIABEL GLOBAL ===== */
-const ADMIN_PASS = "uks9bantul";
-const KEY = "uks";
-let chartInstance;
+/* ===== DATA ===== */
+const questions=[
+ 'Ruang UKS bersih dan nyaman',
+ 'Ketersediaan obat dan alat kesehatan',
+ 'Kecepatan pelayanan UKS',
+ 'Keramahan petugas UKS',
+ 'Manfaat layanan UKS bagi warga madrasah'
+];
 
-// Elemen
-const pass = document.getElementById('pass');
-const loginBox = document.getElementById('loginBox');
-const surveyBox = document.getElementById('surveyBox');
-const adminPanel = document.getElementById('adminPanel');
+const likert=[
+ {v:25,t:'😞 Tidak Puas'},
+ {v:50,t:'😐 Kurang Puas'},
+ {v:75,t:'😊 Puas'},
+ {v:100,t:'😄 Sangat Puas'}
+];
 
-const roleInput = document.getElementById('role');
-const kelasInput = document.getElementById('kelas');
-const namaInput = document.getElementById('nama');
-const scoreInput = document.getElementById('score');
-const saranInput = document.getElementById('saran');
-const msg = document.getElementById('msg');
+let nama='', role='', kelas='', qi=0, answers=[];
 
-const filterStatus = document.getElementById('filterStatus');
-const filterKelas = document.getElementById('filterKelas');
-const total = document.getElementById('total');
-const avg = document.getElementById('avg');
-const saranCount = document.getElementById('saranCount');
-const tbody = document.getElementById('tbody');
-
-/* ===== LOGIN ===== */
-function login(){
-  const value = pass.value.trim();
-  if(value === ADMIN_PASS){
-    loginBox.classList.add('hidden');
-    adminPanel.classList.remove('hidden');
-    loadData();
-  } else if(value === ""){ // Responden biasa
-    loginBox.classList.add('hidden');
-    surveyBox.classList.remove('hidden');
-  } else {
-    alert("Password salah");
-  }
+/* ===== NAV ===== */
+function go(id){
+ ['home','form','survey','saran']
+  .forEach(x=>document.getElementById(x).classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
 }
 
-/* ===== SURVEY LOGIC ===== */
-// Dinamis kelas
-roleInput.addEventListener('change', () => {
-  if(roleInput.value === 'Siswa'){
-    kelasInput.disabled = false;
-  } else {
-    kelasInput.value = '';
-    kelasInput.disabled = true;
+/* ===== STORAGE ===== */
+const load=()=>JSON.parse(localStorage.getItem('uks')||'[]');
+const save=d=>localStorage.setItem('uks',JSON.stringify(d));
+
+/* ===== HOME ===== */
+function updateHome(){
+ const d=load(); if(!d.length)return;
+ const avg=Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
+ avgScore.textContent=avg;
+ statusText.textContent=avg>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
+ statusText.className=avg>=80?
+  'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
+  'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+
+ guru.textContent=pegawai.textContent=vii.textContent=viii.textContent=ix.textContent=0;
+ d.forEach(x=>{
+  if(x.role==='Guru')guru.textContent++;
+  if(x.role==='Pegawai')pegawai.textContent++;
+  if(x.role==='Siswa'){
+    if(x.kelas==='VII')vii.textContent++;
+    if(x.kelas==='VIII')viii.textContent++;
+    if(x.kelas==='IX')ix.textContent++;
   }
+ });
+}
+updateHome();
+
+/* ===== FORM ===== */
+statusGroup.querySelectorAll('.option').forEach(b=>{
+ b.onclick=()=>{
+  statusGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  role=b.dataset.v;
+  kelasBox.classList.toggle('hidden',role!=='Siswa');
+ }
 });
 
-// Reset kelas awal
-if(roleInput.value !== 'Siswa'){
-  kelasInput.disabled = true;
+kelasGroup.querySelectorAll('.option').forEach(b=>{
+ b.onclick=()=>{
+  kelasGroup.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  kelas=b.dataset.v;
+ }
+});
+
+function startSurvey(){
+ nama = document.getElementById('nama').value || '-';
+ if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
+ qi=0; answers=[];
+ go('survey'); renderQ();
 }
 
-function submitForm(){
-  const nama = namaInput.value.trim();
-  const role = roleInput.value;
-  const kelas = kelasInput.value;
-  const score = parseInt(scoreInput.value);
-  const saran = saranInput.value.trim();
+/* ===== SURVEY ===== */
+function renderQ(){
+ qNum.textContent=`Pertanyaan ${qi+1} dari ${questions.length}`;
+ qText.textContent=questions[qi];
+ options.innerHTML='';
+ nextBtn.disabled=true;
 
-  if(!nama || !role || isNaN(score)){
-    alert("Harap isi semua kolom dengan benar!");
-    return;
-  }
+ likert.forEach(l=>{
+  const d=document.createElement('div');
+  d.className='option';
+  d.textContent=l.t;
+  d.onclick=()=>{
+   options.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+   d.classList.add('active');
+   answers[qi]=l.v;
+   nextBtn.disabled=false;
+  };
+  options.appendChild(d);
+ });
 
-  if(role === 'Siswa' && !kelas){
-    alert("Siswa harus memilih kelas!");
-    return;
-  }
+ nextBtn.textContent = qi===questions.length-1 ? 'Lanjutkan →' : 'Selanjutnya →';
+}
 
-  let data = JSON.parse(localStorage.getItem(KEY) || '[]');
+function nextQ(){
+ if(qi<questions.length-1){ qi++; renderQ(); }
+ else go('saran');
+}
 
-  const entry = {
-    nomor: data.length + 1,
-    timestamp: new Date().toLocaleString(),
+/* ===== SUBMIT ===== */
+function submitSurvey(){
+  const score = Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
+  const saran = document.getElementById('saranText').value;
+
+  const d = load();
+  d.push({
     nama,
     role,
-    kelas: role === 'Siswa' ? kelas : '-',
+    kelas,
     score,
-    saran
-  };
-
-  data.push(entry);
-  localStorage.setItem(KEY, JSON.stringify(data));
-
-  msg.textContent = "Terima kasih! Survei berhasil dikirim.";
-  namaInput.value = '';
-  roleInput.value = '';
-  kelasInput.value = '';
-  kelasInput.disabled = true;
-  scoreInput.value = '';
-  saranInput.value = '';
-}
-
-/* ===== ADMIN LOGIC ===== */
-filterStatus.onchange = filterKelas.onchange = loadData;
-
-function loadData(){
-  let d = JSON.parse(localStorage.getItem(KEY)||'[]');
-  const status = filterStatus.value;
-  const kelasF = filterKelas.value;
-  if(status) d = d.filter(x=>x.role===status);
-  if(kelasF) d = d.filter(x=>x.kelas===kelasF);
-
-  total.textContent = d.length;
-  avg.textContent = d.length ? (d.reduce((a,b)=>a+b.score,0)/d.length).toFixed(1) : 0;
-  saranCount.textContent = d.filter(x=>x.saran && x.saran.trim()).length;
-
-  renderChart(d);
-
-  tbody.innerHTML='';
-  d.forEach((x,i)=>{
-    tbody.innerHTML += `
-      <tr class="border-b">
-        <td class="p-2 text-center">${i+1}</td>
-        <td>${x.timestamp || '-'}</td>
-        <td>${x.nama||'-'}</td>
-        <td>${x.role}</td>
-        <td>${x.kelas||'-'}</td>
-        <td class="font-bold">${x.score}</td>
-        <td class="text-gray-600">${x.saran||'-'}</td>
-      </tr>`;
+    saran,
+    timestamp: new Date().toLocaleString()  // ✅ Tambahkan timestamp
   });
-}
+  save(d);
 
-/* ===== CHART ===== */
-function renderChart(data){
-  const ctx = document.getElementById('chartResponden').getContext('2d');
-  const counts = [
-    data.filter(d=>d.role==='Guru').length,
-    data.filter(d=>d.role==='Pegawai').length,
-    data.filter(d=>d.kelas==='VII').length,
-    data.filter(d=>d.kelas==='VIII').length,
-    data.filter(d=>d.kelas==='IX').length
-  ];
-  if(chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels: ['Guru','Pegawai','VII','VIII','IX'],
-      datasets:[{
-        label:'Jumlah Responden',
-        data: counts,
-        backgroundColor: [
-          '#16a34a', '#3b82f6', '#facc15', '#ef4444', '#f97316'
-        ]
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{legend:{display:false}},
-      scales:{y:{beginAtZero:true}}
-    }
-  });
-}
-
-/* ===== EXPORT CSV ===== */
-function exportCSV(){
-  const d = JSON.parse(localStorage.getItem(KEY)||'[]');
-  if(!d.length){ alert('Data kosong'); return; }
-
-  let csv = "No,Timestamp,Nama,Status,Kelas,Skor,Saran\n";
-  d.forEach((x,i)=>{
-    csv += `${i+1},"${x.timestamp||''}","${x.nama||''}",${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
-  });
-
-  const blob = new Blob([csv],{type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'hasil_survei_uks.csv';
-  a.click();
-}
-
-/* ===== CLEAR DATA ===== */
-function clearData(){
-  if(confirm('Hapus semua data survei?')){
-    localStorage.removeItem(KEY);
-    loadData();
-  }
-}
-
-/* ===== FULLSCREEN ===== */
-function toggleFullScreen(){
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else { document.exitFullscreen(); }
+  // Reset
+  document.getElementById('saranText').value='';
+  updateHome();
+  go('home');
 }
 </script>
 
 </body>
 </html>
+F
