@@ -6,6 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
 body{font-family:Nunito,sans-serif}
 .hidden{display:none}
@@ -123,11 +127,27 @@ canvas{max-height:300px;}
 </div>
 
 <script>
+/* ===== FIREBASE CONFIG ===== */
+// Ganti config ini dengan milikmu dari Firebase console
+const firebaseConfig = {
+  apiKey: "API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 /* ===== VARIABEL GLOBAL ===== */
 const ADMIN_PASS = "uks9bantul";
-const KEY = "uks";
 let chartInstance;
 
+/* ===== ELEMENT ===== */
 const pass = document.getElementById('pass');
 const loginBox = document.getElementById('loginBox');
 const adminPanel = document.getElementById('adminPanel');
@@ -158,24 +178,57 @@ function toggleFullScreen(){
 filterStatus.onchange = filterKelas.onchange = loadData;
 
 function loadData(){
-  let d = JSON.parse(localStorage.getItem(KEY)||'[]');
-  const status = filterStatus.value;
-  const kelasF = filterKelas.value;
-  if(status) d = d.filter(x=>x.role===status);
-  if(kelasF) d = d.filter(x=>x.kelas===kelasF);
+  db.ref('survei').once('value', snapshot=>{
+    let data = snapshot.val() || {};
+    let arr = Object.values(data);
 
-  total.textContent = d.length;
-  avg.textContent = d.length ? (d.reduce((a,b)=>a+b.score,0)/d.length).toFixed(1) : 0;
-  saranCount.textContent = d.filter(x=>x.saran && x.saran.trim()).length;
+    // Filter
+    const status = filterStatus.value;
+    const kelasF = filterKelas.value;
+    if(status) arr = arr.filter(x=>x.role===status);
+    if(kelasF) arr = arr.filter(x=>x.kelas===kelasF);
 
-  renderChart(d);
+    // Ringkasan
+    total.textContent = arr.length;
+    avg.textContent = arr.length ? (arr.reduce((a,b)=>a+b.score,0)/arr.length).toFixed(1) : 0;
+    saranCount.textContent = arr.filter(x=>x.saran && x.saran.trim()).length;
 
+    renderChart(arr);
+    renderTable(arr);
+  });
+}
+
+function renderChart(arr){
+  const ctx = document.getElementById('chartResponden').getContext('2d');
+  const counts = [
+    arr.filter(d=>d.role==='Guru').length,
+    arr.filter(d=>d.role==='Pegawai').length,
+    arr.filter(d=>d.kelas==='VII').length,
+    arr.filter(d=>d.kelas==='VIII').length,
+    arr.filter(d=>d.kelas==='IX').length
+  ];
+  if(chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Guru','Pegawai','VII','VIII','IX'],
+      datasets:[{
+        label:'Jumlah Responden',
+        data: counts,
+        backgroundColor:['#16a34a','#3b82f6','#facc15','#ef4444','#f97316']
+      }]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+}
+
+function renderTable(arr){
   tbody.innerHTML='';
-  d.forEach((x,i)=>{
+  arr.forEach((x,i)=>{
     tbody.innerHTML += `
       <tr class="border-b">
         <td class="p-2 text-center">${i+1}</td>
-        <td>${x.timestamp || '-'}</td>
+        <td>${x.timestamp||'-'}</td>
         <td>${x.nama||'-'}</td>
         <td>${x.role}</td>
         <td>${x.kelas||'-'}</td>
@@ -185,59 +238,30 @@ function loadData(){
   });
 }
 
-/* ===== CHART ===== */
-function renderChart(data){
-  const ctx = document.getElementById('chartResponden').getContext('2d');
-  const counts = [
-    data.filter(d=>d.role==='Guru').length,
-    data.filter(d=>d.role==='Pegawai').length,
-    data.filter(d=>d.kelas==='VII').length,
-    data.filter(d=>d.kelas==='VIII').length,
-    data.filter(d=>d.kelas==='IX').length
-  ];
-  if(chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels: ['Guru','Pegawai','VII','VIII','IX'],
-      datasets:[{
-        label:'Jumlah Responden',
-        data: counts,
-        backgroundColor: [
-          '#16a34a', '#3b82f6', '#facc15', '#ef4444', '#f97316'
-        ]
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{legend:{display:false}},
-      scales:{y:{beginAtZero:true}}
-    }
-  });
-}
-
 /* ===== EXPORT CSV ===== */
 function exportCSV(){
-  const d = JSON.parse(localStorage.getItem(KEY)||'[]');
-  if(!d.length){ alert('Data kosong'); return; }
+  db.ref('survei').once('value', snapshot=>{
+    let data = snapshot.val() || {};
+    let arr = Object.values(data);
+    if(!arr.length){ alert('Data kosong'); return; }
 
-  let csv = "No,Timestamp,Nama,Status,Kelas,Skor,Saran\n";
-  d.forEach((x,i)=>{
-    csv += `${i+1},"${x.timestamp||''}","${x.nama||''}",${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
+    let csv = "No,Timestamp,Nama,Status,Kelas,Skor,Saran\n";
+    arr.forEach((x,i)=>{
+      csv += `${i+1},"${x.timestamp||''}","${x.nama||''}",${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
+    });
+
+    const blob = new Blob([csv],{type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hasil_survei_uks.csv';
+    a.click();
   });
-
-  const blob = new Blob([csv],{type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'hasil_survei_uks.csv';
-  a.click();
 }
 
 /* ===== CLEAR DATA ===== */
 function clearData(){
   if(confirm('Hapus semua data survei?')){
-    localStorage.removeItem(KEY);
-    loadData();
+    db.ref('survei').remove().then(()=>loadData());
   }
 }
 </script>
