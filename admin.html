@@ -16,7 +16,7 @@ body{font-family:Nunito,sans-serif}
 
 <div class="max-w-5xl mx-auto">
 
-<!-- ============ LOGIN ============ -->
+<!-- LOGIN -->
 <section id="loginBox" class="bg-white rounded-2xl shadow p-6 max-w-md mx-auto">
   <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">
     🔐 Login Admin UKS
@@ -33,7 +33,7 @@ body{font-family:Nunito,sans-serif}
   </button>
 </section>
 
-<!-- ============ ADMIN PANEL ============ -->
+<!-- ADMIN PANEL -->
 <section id="adminPanel" class="hidden">
 
   <h1 class="text-3xl font-extrabold text-green-700 mb-6">
@@ -74,6 +74,7 @@ body{font-family:Nunito,sans-serif}
       <thead class="bg-green-600 text-white">
         <tr>
           <th class="p-2">No</th>
+          <th>Nama</th>
           <th>Status</th>
           <th>Kelas</th>
           <th>Skor</th>
@@ -92,7 +93,7 @@ body{font-family:Nunito,sans-serif}
 const ADMIN_PASS = "uks9bantul";
 const KEY = "uks";
 
-/* ===== LOGIN ===== */
+/* LOGIN */
 function login(){
   if(pass.value === ADMIN_PASS){
     loginBox.classList.add('hidden');
@@ -103,7 +104,7 @@ function login(){
   }
 }
 
-/* ===== LOAD DATA ===== */
+/* LOAD DATA */
 function loadData(){
   const d = JSON.parse(localStorage.getItem(KEY)||'[]');
 
@@ -119,6 +120,7 @@ function loadData(){
     tbody.innerHTML += `
       <tr class="border-b">
         <td class="p-2 text-center">${i+1}</td>
+        <td>${x.nama||'-'}</td>
         <td>${x.role}</td>
         <td>${x.kelas||'-'}</td>
         <td class="font-bold">${x.score}</td>
@@ -127,14 +129,14 @@ function loadData(){
   });
 }
 
-/* ===== EXPORT CSV ===== */
+/* EXPORT CSV */
 function exportCSV(){
   const d = JSON.parse(localStorage.getItem(KEY)||'[]');
   if(!d.length){ alert('Data kosong'); return; }
 
-  let csv = "No,Status,Kelas,Skor,Saran\n";
+  let csv = "No,Nama,Status,Kelas,Skor,Saran\n";
   d.forEach((x,i)=>{
-    csv += `${i+1},${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
+    csv += `${i+1},${x.nama||''},${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
   });
 
   const blob = new Blob([csv],{type:'text/csv'});
@@ -144,7 +146,7 @@ function exportCSV(){
   a.click();
 }
 
-/* ===== CLEAR ===== */
+/* CLEAR DATA */
 function clearData(){
   if(confirm('Hapus semua data survei?')){
     localStorage.removeItem(KEY);
