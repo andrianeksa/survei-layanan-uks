@@ -2,8 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Survei Kepuasan UKS</title>
+  <title>Survei Kepuasan UKS MTs Negeri 9 Bantul</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -20,9 +21,9 @@
       transition: all .2s ease;
     }
     .likert-option.selected {
-      border-color:#4CAF50;
-      background:#e8f5e9;
-      transform:scale(1.05);
+      border-color: #4CAF50;
+      background: #e8f5e9;
+      transform: scale(1.05);
     }
   </style>
 </head>
@@ -31,7 +32,7 @@
 
 <div id="app" class="max-w-xl mx-auto p-6">
 
-<!-- HOME -->
+<!-- ================= HOME ================= -->
 <section id="home" class="fade-in">
   <h1 class="text-3xl font-extrabold text-center text-green-700">
     Survei Kepuasan Layanan UKS
@@ -71,7 +72,7 @@
   </button>
 </section>
 
-<!-- RESPONDENT -->
+<!-- ================= RESPONDENT ================= -->
 <section id="respondent" class="hidden fade-in">
   <div class="bg-white rounded-2xl shadow p-6">
     <h2 class="text-xl font-bold text-green-700 mb-4 text-center">📋 Data Responden</h2>
@@ -84,17 +85,17 @@
 
     <p class="font-semibold mb-2">Status Anda:</p>
     <div class="grid grid-cols-3 gap-2">
-      <button onclick="setRole('Guru')" class="role btn border-2 rounded-xl py-2">👨‍🏫 Guru</button>
-      <button onclick="setRole('Pegawai')" class="role btn border-2 rounded-xl py-2">👔 Pegawai</button>
-      <button onclick="setRole('Siswa')" class="role btn border-2 rounded-xl py-2">👨‍🎓 Siswa</button>
+      <button onclick="setRole('Guru')" class="border-2 rounded-xl py-2">👨‍🏫 Guru</button>
+      <button onclick="setRole('Pegawai')" class="border-2 rounded-xl py-2">👔 Pegawai</button>
+      <button onclick="setRole('Siswa')" class="border-2 rounded-xl py-2">👨‍🎓 Siswa</button>
     </div>
 
     <div id="kelasBox" class="hidden mt-4">
       <p class="font-semibold mb-2">Kelas:</p>
       <div class="grid grid-cols-3 gap-2">
-        <button onclick="setClass('VII')" class="kelas btn border-2 rounded-xl py-2">VII</button>
-        <button onclick="setClass('VIII')" class="kelas btn border-2 rounded-xl py-2">VIII</button>
-        <button onclick="setClass('IX')" class="kelas btn border-2 rounded-xl py-2">IX</button>
+        <button onclick="setClass('VII')" class="border-2 rounded-xl py-2">VII</button>
+        <button onclick="setClass('VIII')" class="border-2 rounded-xl py-2">VIII</button>
+        <button onclick="setClass('IX')" class="border-2 rounded-xl py-2">IX</button>
       </div>
     </div>
 
@@ -108,7 +109,7 @@
   </div>
 </section>
 
-<!-- SURVEY -->
+<!-- ================= SURVEY ================= -->
 <section id="survey" class="hidden fade-in">
   <div class="bg-white rounded-2xl shadow p-6">
     <p id="qNum" class="text-sm font-semibold text-green-700"></p>
@@ -123,7 +124,7 @@
   </div>
 </section>
 
-<!-- FEEDBACK -->
+<!-- ================= FEEDBACK ================= -->
 <section id="feedback" class="hidden fade-in">
   <div class="bg-white rounded-2xl shadow p-6">
     <h2 class="font-bold text-green-700 text-xl mb-2 text-center">💬 Saran</h2>
@@ -141,7 +142,7 @@
 </div>
 
 <script>
-/* ===== DATA ===== */
+/* ================= DATA ================= */
 const questions = [
   'Ruang UKS bersih dan nyaman digunakan',
   'Obat dan alat kesehatan tersedia',
@@ -149,108 +150,142 @@ const questions = [
   'Petugas UKS ramah',
   'Layanan UKS bermanfaat'
 ];
-const opts = [
-  {v:1,t:'Tidak Puas 😞'},
-  {v:2,t:'Kurang Puas 😐'},
-  {v:3,t:'Puas 😊'},
-  {v:4,t:'Sangat Puas 😄'}
+
+const options = [
+  {v:1, t:'Tidak Puas 😞'},
+  {v:2, t:'Kurang Puas 😐'},
+  {v:3, t:'Puas 😊'},
+  {v:4, t:'Sangat Puas 😄'}
 ];
 
 let role='', kelas='', answers=[], qi=0;
 
-/* ===== STORAGE ===== */
+/* ================= STORAGE ================= */
 const KEY = 'surveyUKS';
 const load = () => JSON.parse(localStorage.getItem(KEY) || '[]');
 const save = d => localStorage.setItem(KEY, JSON.stringify(d));
 
-/* ===== UI ===== */
-const go = id => {
+/* ================= NAV ================= */
+function go(id){
   document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
-};
+}
 
+/* ================= RESPONDENT ================= */
 function setRole(r){
-  role=r; kelas='';
-  document.getElementById('kelasBox').classList.toggle('hidden', r!=='Siswa');
-  document.getElementById('nextBtn').disabled = r==='Siswa';
+  role = r;
+  kelas = '';
+  document.getElementById('kelasBox').classList.toggle('hidden', r !== 'Siswa');
+  document.getElementById('nextBtn').disabled = r === 'Siswa';
 }
 function setClass(k){
-  kelas=k;
-  document.getElementById('nextBtn').disabled=false;
+  kelas = k;
+  document.getElementById('nextBtn').disabled = false;
 }
 
+/* ================= SURVEY ================= */
 function startSurvey(){
-  answers=[]; qi=0;
+  answers = [];
+  qi = 0;
   go('survey');
   renderQ();
 }
 
-/* ===== HIGHLIGHT FIX (INTI PERBAIKAN) ===== */
 function renderQ(){
   document.getElementById('qNum').textContent = `Pertanyaan ${qi+1}/5`;
   document.getElementById('qText').textContent = questions[qi];
 
-  const o = document.getElementById('opts');
-  o.innerHTML = '';
+  const box = document.getElementById('opts');
+  box.innerHTML = '';
 
-  opts.forEach(x => {
-    const b = document.createElement('button');
-    b.className = 'likert-option border-2 rounded-xl p-3';
-    b.textContent = x.t;
+  options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'likert-option border-2 rounded-xl p-3';
+    btn.textContent = opt.t;
 
-    // jika soal ini sudah pernah dijawab
-    if (answers[qi] === x.v) {
-      b.classList.add('selected');
+    if(answers[qi] === opt.v){
+      btn.classList.add('selected');
       document.getElementById('nextQ').disabled = false;
     }
 
-    b.onclick = () => {
-      // hapus highlight opsi lain
-      o.querySelectorAll('.likert-option')
-        .forEach(el => el.classList.remove('selected'));
+    btn.onclick = () => {
+      box.querySelectorAll('.likert-option')
+        .forEach(b=>b.classList.remove('selected'));
 
-      // aktifkan highlight opsi terpilih
-      b.classList.add('selected');
-
-      // simpan jawaban
-      answers[qi] = x.v;
-
-      // aktifkan tombol lanjut
+      btn.classList.add('selected');
+      answers[qi] = opt.v;
       document.getElementById('nextQ').disabled = false;
     };
 
-    o.appendChild(b);
+    box.appendChild(btn);
   });
 
-  // default tombol lanjut mati
-  if (!answers[qi]) {
+  if(!answers[qi]){
     document.getElementById('nextQ').disabled = true;
   }
 }
 
-  /* ===== HOME UPDATE ===== */
-function updateHome(){
-  const d=load();
-  if(!d.length)return;
-  const avg=Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
-  document.getElementById('avgScore').textContent=avg;
-  document.getElementById('statusText').textContent =
-    avg>=80?'✓ Target minimal kepuasan (80) telah tercapai.':'Dalam proses peningkatan layanan.';
-  document.getElementById('statusText').className =
-    avg>=80?'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
-             'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+function nextQ(){
+  qi++;
+  qi < questions.length ? renderQ() : go('feedback');
+}
 
-  ['guru','pegawai','vii','viii','ix'].forEach(id=>document.getElementById(id).textContent=0);
+/* ================= SUBMIT ================= */
+function submitSurvey(){
+  const total = answers.reduce((a,b)=>a+b,0);
+  const score = Math.round(total / 20 * 100);
+
+  const data = load();
+  data.push({ role, kelas, score });
+  save(data);
+
+  resetForm();
+  updateHome();
+  go('home');
+}
+
+function resetForm(){
+  document.getElementById('name').value='';
+  document.getElementById('saran').value='';
+  role=''; kelas='';
+}
+
+/* ================= HOME UPDATE ================= */
+function updateHome(){
+  const d = load();
+
+  if(!d.length){
+    document.getElementById('avgScore').textContent = 0;
+    return;
+  }
+
+  const avg = Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
+  document.getElementById('avgScore').textContent = avg;
+
+  const status = document.getElementById('statusText');
+  status.textContent =
+    avg >= 80
+      ? '✓ Target minimal kepuasan (80) telah tercapai.'
+      : 'Dalam proses peningkatan layanan.';
+  status.className =
+    avg >= 80
+      ? 'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full'
+      : 'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+
+  ['guru','pegawai','vii','viii','ix']
+    .forEach(id=>document.getElementById(id).textContent=0);
+
   d.forEach(x=>{
-    if(x.role==='Guru')guru.textContent++;
-    if(x.role==='Pegawai')pegawai.textContent++;
+    if(x.role==='Guru') guru.textContent++;
+    if(x.role==='Pegawai') pegawai.textContent++;
     if(x.role==='Siswa'){
-      if(x.kelas==='VII')vii.textContent++;
-      if(x.kelas==='VIII')viii.textContent++;
-      if(x.kelas==='IX')ix.textContent++;
+      if(x.kelas==='VII') vii.textContent++;
+      if(x.kelas==='VIII') viii.textContent++;
+      if(x.kelas==='IX') ix.textContent++;
     }
   });
 }
+
 updateHome();
 </script>
 
