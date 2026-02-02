@@ -125,9 +125,20 @@ canvas{max-height:300px;}
 </div>
 
 <script>
+/* ===== VARIABEL GLOBAL ===== */
 const ADMIN_PASS = "uks9bantul";
 const KEY = "uks";
 let chartInstance;
+
+const pass = document.getElementById('pass');
+const loginBox = document.getElementById('loginBox');
+const adminPanel = document.getElementById('adminPanel');
+const filterStatus = document.getElementById('filterStatus');
+const filterKelas = document.getElementById('filterKelas');
+const total = document.getElementById('total');
+const avg = document.getElementById('avg');
+const saranCount = document.getElementById('saranCount');
+const tbody = document.getElementById('tbody');
 
 /* ===== LOGIN ===== */
 function login(){
@@ -146,9 +157,6 @@ function toggleFullScreen(){
 }
 
 /* ===== LOAD DATA ===== */
-const filterStatus = document.getElementById('filterStatus');
-const filterKelas = document.getElementById('filterKelas');
-
 filterStatus.onchange = filterKelas.onchange = loadData;
 
 function loadData(){
@@ -159,7 +167,7 @@ function loadData(){
   if(kelasF) d = d.filter(x=>x.kelas===kelasF);
 
   total.textContent = d.length;
-  avg.textContent = d.length ? Math.round(d.reduce((a,b)=>a+b.score,0)/d.length) : 0;
+  avg.textContent = d.length ? (d.reduce((a,b)=>a+b.score,0)/d.length).toFixed(1) : 0;
   saranCount.textContent = d.filter(x=>x.saran && x.saran.trim()).length;
 
   renderChart(d);
@@ -168,8 +176,8 @@ function loadData(){
   d.forEach((x,i)=>{
     tbody.innerHTML += `
       <tr class="border-b">
-        <td class="p-2 text-center">${x.nomor || i+1}</td>
-        <td>${x.timestamp || '-'}</td>
+        <td class="p-2 text-center">${i+1}</td>
+        <td>${x.timestamp||'-'}</td>
         <td>${x.nama||'-'}</td>
         <td>${x.role}</td>
         <td>${x.kelas||'-'}</td>
@@ -182,7 +190,6 @@ function loadData(){
 /* ===== CHART ===== */
 function renderChart(data){
   const ctx = document.getElementById('chartResponden').getContext('2d');
-  const labels = ['Guru','Pegawai','VII','VIII','IX'];
   const counts = [
     data.filter(d=>d.role==='Guru').length,
     data.filter(d=>d.role==='Pegawai').length,
@@ -192,27 +199,28 @@ function renderChart(data){
   ];
   if(chartInstance) chartInstance.destroy();
   chartInstance = new Chart(ctx,{
-  type:'bar',
-  data:{
-    labels: ['Guru','Pegawai','VII','VIII','IX'],
-    datasets:[{
-      label:'Jumlah Responden',
-      data: counts,
-      backgroundColor: [
-        '#16a34a', // Guru - hijau
-        '#3b82f6', // Pegawai - biru
-        '#facc15', // VII - kuning
-        '#ef4444', // VIII - merah
-        '#f97316'  // IX - oranye
-      ]
-    }]
-  },
-  options:{
-    responsive:true,
-    plugins:{legend:{display:false}},
-    scales:{y:{beginAtZero:true}}
-  }
-});
+    type:'bar',
+    data:{
+      labels: ['Guru','Pegawai','VII','VIII','IX'],
+      datasets:[{
+        label:'Jumlah Responden',
+        data: counts,
+        backgroundColor: [
+          '#16a34a', // Guru - hijau
+          '#3b82f6', // Pegawai - biru
+          '#facc15', // VII - kuning
+          '#ef4444', // VIII - merah
+          '#f97316'  // IX - oranye
+        ]
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true}}
+    }
+  });
+}
 
 /* ===== EXPORT CSV ===== */
 function exportCSV(){
@@ -221,7 +229,7 @@ function exportCSV(){
 
   let csv = "No,Timestamp,Nama,Status,Kelas,Skor,Saran\n";
   d.forEach((x,i)=>{
-    csv += `${x.nomor||i+1},"${x.timestamp||''}","${x.nama||''}",${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
+    csv += `${i+1},"${x.timestamp||''}","${x.nama||''}",${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
   });
 
   const blob = new Blob([csv],{type:'text/csv'});
