@@ -8,21 +8,10 @@
 <style>
 body { font-family: Nunito, sans-serif; }
 .option{
-  border:2px solid #e5e7eb;
-  padding:14px;
-  border-radius:16px;
-  cursor:pointer;
-  transition:.2s;
-  background:#fff;
+  border:2px solid #e5e7eb; padding:14px; border-radius:16px; cursor:pointer; transition:.2s; background:#fff;
 }
 .option:hover{ border-color:#22c55e }
-.option.active{
-  background:#dcfce7;
-  border-color:#16a34a;
-  color:#166534;
-  font-weight:700;
-  transform:scale(1.04);
-}
+.option.active{ background:#dcfce7; border-color:#16a34a; color:#166534; font-weight:700; transform:scale(1.04);}
 .hidden{ display:none }
 .disabled { opacity:0.4; cursor:not-allowed }
 </style>
@@ -86,8 +75,7 @@ body { font-family: Nunito, sans-serif; }
 <section id="saran" class="hidden">
   <div class="bg-white rounded-3xl shadow-xl p-6">
     <h2 class="text-xl font-extrabold text-center text-green-700 mb-4">💬 Saran & Masukan</h2>
-    <textarea id="saranText" rows="5" class="w-full border-2 rounded-xl p-3"
-      placeholder="Contoh: Ruang UKS sudah nyaman, tetapi perlu penambahan kipas angin."></textarea>
+    <textarea id="saranText" rows="5" class="w-full border-2 rounded-xl p-3" placeholder="Contoh: Ruang UKS sudah nyaman, tetapi perlu penambahan kipas angin."></textarea>
     <button onclick="submitSurvey()" class="mt-5 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">Kirim Survei ✓</button>
   </div>
 </section>
@@ -95,22 +83,11 @@ body { font-family: Nunito, sans-serif; }
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbw-_9QX8UGAOiBaQivyJ8QUW2RFih9eOwi7phk0WrFe0dasoOaumr-mUbBwPLpkGwg1/exec";
+const POST_URL = "https://script.google.com/macros/s/AKfycbzxpXXxV8DFFtmPTRBpdHT3eXSZ_18YYNWcCt5pQtPSZswWBHQDjBY_mMVp8wAU9OwE/exec"; // POST submit
+const GET_URL  = "https://script.google.com/macros/s/AKfycbzxpXXxV8DFFtmPTRBpdHT3eXSZ_18YYNWcCt5pQtPSZswWBHQDjBY_mMVp8wAU9OwE/exec"; // GET fetch data
 
-const questions=[
- 'Ruang UKS bersih dan nyaman',
- 'Ketersediaan obat dan alat kesehatan',
- 'Kecepatan pelayanan UKS',
- 'Keramahan petugas UKS',
- 'Manfaat layanan UKS bagi warga madrasah'
-];
-
-const likert=[
- {v:25,t:'😞 Tidak Puas'},
- {v:50,t:'😐 Kurang Puas'},
- {v:75,t:'😊 Puas'},
- {v:100,t:'😄 Sangat Puas'}
-];
+const questions=['Ruang UKS bersih dan nyaman','Ketersediaan obat dan alat kesehatan','Kecepatan pelayanan UKS','Keramahan petugas UKS','Manfaat layanan UKS'];
+const likert=[{v:25,t:'😞 Tidak Puas'},{v:50,t:'😐 Kurang Puas'},{v:75,t:'😊 Puas'},{v:100,t:'😄 Sangat Puas'}];
 
 let nama='', role='', kelas='', qi=0, answers=[];
 
@@ -124,22 +101,20 @@ function go(id){
 document.querySelectorAll('#statusGroup .option').forEach(b=>{
  b.onclick=()=>{
    document.querySelectorAll('#statusGroup .option').forEach(x=>x.classList.remove('active'));
-   b.classList.add('active');
-   role=b.dataset.v;
+   b.classList.add('active'); role=b.dataset.v;
    document.getElementById('kelasBox').classList.toggle('hidden', role!=='Siswa');
  };
 });
 document.querySelectorAll('#kelasGroup .option').forEach(b=>{
  b.onclick=()=>{
    document.querySelectorAll('#kelasGroup .option').forEach(x=>x.classList.remove('active'));
-   b.classList.add('active');
-   kelas=b.dataset.v;
+   b.classList.add('active'); kelas=b.dataset.v;
  };
 });
 
 function startSurvey(){
- nama = document.getElementById('nama').value || '-';
- if(!role || (role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
+ nama=document.getElementById('nama').value||'-';
+ if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
  qi=0; answers=[]; go('survey'); renderQ();
 }
 
@@ -149,95 +124,59 @@ function renderQ(){
  document.getElementById('qText').textContent=questions[qi];
  const optionsDiv=document.getElementById('options');
  optionsDiv.innerHTML='';
- document.getElementById('nextBtn').disabled=true;
- document.getElementById('nextBtn').classList.add('disabled');
-
+ document.getElementById('nextBtn').disabled=true; document.getElementById('nextBtn').classList.add('disabled');
  likert.forEach(l=>{
    const d=document.createElement('div');
-   d.className='option';
-   d.textContent=l.t;
+   d.className='option'; d.textContent=l.t;
    d.onclick=()=>{
      optionsDiv.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-     d.classList.add('active');
-     answers[qi]=l.v;
+     d.classList.add('active'); answers[qi]=l.v;
      document.getElementById('nextBtn').disabled=false;
      document.getElementById('nextBtn').classList.remove('disabled');
    };
    optionsDiv.appendChild(d);
  });
-
  document.getElementById('nextBtn').textContent = qi===questions.length-1 ? 'Selesai →' : 'Selanjutnya →';
 }
 
-function nextQ(){
- if(qi<questions.length-1){ qi++; renderQ(); }
- else go('saran');
-}
+function nextQ(){ if(qi<questions.length-1){ qi++; renderQ(); } else go('saran'); }
 
 // Submit
 function submitSurvey(){
  const score = Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
  const saran = document.getElementById('saranText').value;
+ const data={nama,role,kelas,score,saran};
 
- const data = {nama, role, kelas, score, saran};
-
- // Simpan lokal
- const d = JSON.parse(localStorage.getItem('uks')||'[]');
- d.push(data);
- localStorage.setItem('uks', JSON.stringify(d));
-
- // Kirim ke Apps Script
- fetch(scriptURL, {
-   method: "POST",
-   headers: { "Content-Type": "text/plain;charset=utf-8" },
-   body: JSON.stringify(data)
- })
+ fetch(POST_URL,{ method:"POST", headers:{ "Content-Type":"application/json"}, body:JSON.stringify(data)})
  .then(res=>res.json())
- .then(resp=>{
-   if(resp.status==='ok'){
-     alert("Survei berhasil dikirim!");
-     document.getElementById('saranText').value='';
-     updateHome();
-     go('home');
-   } else alert("Gagal kirim survei: "+resp.message);
- })
- .catch(err=>{
-   alert("Gagal kirim survei: "+err);
- });
-
+ .then(resp=>{ if(resp.status==='ok'){ alert("Survei berhasil dikirim!"); document.getElementById('saranText').value=''; fetchAndUpdateHome(); go('home'); } else alert("Gagal kirim survei: "+resp.message); })
+ .catch(err=>alert("Gagal kirim survei: "+err));
 }
 
-// Update Home
-function updateHome(){
- const d = JSON.parse(localStorage.getItem('uks')||'[]');
- if(!d.length) return;
+// Fetch data dari Sheet
+async function fetchAndUpdateHome(){
+ try{
+   const res = await fetch(GET_URL);
+   const d = await res.json();
+   if(!d.length) return;
+   let avg=Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
+   document.getElementById('avgScore').textContent=avg;
+   document.getElementById('statusText').textContent=avg>=80?'✓ Target kepuasan tercapai':'Dalam proses peningkatan layanan';
+   document.getElementById('statusText').className=avg>=80?'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
 
- let avg = Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
- document.getElementById('avgScore').textContent = avg;
- document.getElementById('statusText').textContent = avg>=80 ? '✓ Target kepuasan tercapai' : 'Dalam proses peningkatan layanan';
- document.getElementById('statusText').className = avg>=80 ?
-   'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full' :
-   'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+   let guru=0,pegawai=0,vii=0,viii=0,ix=0;
+   d.forEach(x=>{ if(x.role==='Guru') guru++; if(x.role==='Pegawai') pegawai++; if(x.role==='Siswa'){ if(x.kelas==='VII') vii++; if(x.kelas==='VIII') viii++; if(x.kelas==='IX') ix++; }});
+   document.getElementById('guru').textContent=guru;
+   document.getElementById('pegawai').textContent=pegawai;
+   document.getElementById('vii').textContent=vii;
+   document.getElementById('viii').textContent=viii;
+   document.getElementById('ix').textContent=ix;
 
- let guru=0, pegawai=0, vii=0, viii=0, ix=0;
- d.forEach(x=>{
-   if(x.role==='Guru') guru++;
-   if(x.role==='Pegawai') pegawai++;
-   if(x.role==='Siswa'){
-     if(x.kelas==='VII') vii++;
-     if(x.kelas==='VIII') viii++;
-     if(x.kelas==='IX') ix++;
-   }
- });
- document.getElementById('guru').textContent = guru;
- document.getElementById('pegawai').textContent = pegawai;
- document.getElementById('vii').textContent = vii;
- document.getElementById('viii').textContent = viii;
- document.getElementById('ix').textContent = ix;
+ }catch(err){ console.error(err); }
 }
 
-// Load stats on start
-updateHome();
+// Load home data saat halaman dibuka
+fetchAndUpdateHome();
 </script>
 </body>
 </html>
