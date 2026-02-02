@@ -164,7 +164,7 @@ const likert=[
  {v:100,t:'😄 Sangat Puas'}
 ];
 
-let role='',kelas='',qi=0,answers=[];
+let nama='', role='', kelas='', qi=0, answers=[];
 
 /* ===== NAV ===== */
 function go(id){
@@ -219,6 +219,7 @@ kelasGroup.querySelectorAll('.option').forEach(b=>{
 });
 
 function startSurvey(){
+ nama = document.getElementById('nama').value || '-';
  if(!role||(role==='Siswa'&&!kelas)){ alert('Lengkapi data'); return; }
  qi=0; answers=[];
  go('survey'); renderQ();
@@ -257,7 +258,7 @@ function submitSurvey(){
  const score=Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
  const saran=document.getElementById('saranText').value;
  const d=load();
- d.push({role,kelas,score,saran});
+ d.push({nama, role, kelas, score, saran}); // <-- nama ditambahkan
  save(d);
  document.getElementById('saranText').value='';
  updateHome();
