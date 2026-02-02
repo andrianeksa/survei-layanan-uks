@@ -5,18 +5,33 @@
 <title>Admin Survei UKS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body { font-family: Nunito, sans-serif; }
 table { border-collapse: collapse; width: 100%; }
 th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: center; }
 th { background-color: #d1fae5; }
+.hidden { display:none; }
+button { cursor:pointer; }
 </style>
 </head>
 <body class="bg-green-50 min-h-screen p-6">
 
-<h1 class="text-3xl font-extrabold text-center text-green-700 mb-6">Admin Survei UKS</h1>
+<!-- LOGIN -->
+<section id="login">
+  <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 mt-20">
+    <h1 class="text-3xl font-bold text-center text-green-700 mb-6">Admin Login</h1>
+    <input id="username" placeholder="Username" class="w-full border-2 rounded-xl p-3 mb-4">
+    <input id="password" placeholder="Password" type="password" class="w-full border-2 rounded-xl p-3 mb-4">
+    <button onclick="login()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">Login</button>
+  </div>
+</section>
 
-<div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-6">
+<!-- ADMIN PANEL -->
+<section id="admin" class="hidden">
+<h1 class="text-3xl font-extrabold text-center text-green-700 mb-6">Admin Panel Survei UKS</h1>
+
+<div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-6 mb-6">
   <h2 class="text-xl font-bold mb-4">📊 Statistik Ringkas</h2>
   <div class="grid grid-cols-2 gap-4 mb-6">
     <div>Jumlah Guru: <span id="guru">0</span></div>
@@ -26,7 +41,10 @@ th { background-color: #d1fae5; }
     <div>Jumlah Siswa IX: <span id="ix">0</span></div>
     <div>Rata-rata Skor: <span id="avgScore">0</span></div>
   </div>
+  <canvas id="chartScore" class="mb-6" height="200"></canvas>
+</div>
 
+<div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-6 mb-6">
   <h2 class="text-xl font-bold mb-4">📋 Detail Responden</h2>
   <table id="tableResponden">
     <thead>
@@ -37,61 +55,109 @@ th { background-color: #d1fae5; }
         <th>Kelas</th>
         <th>Score</th>
         <th>Saran</th>
+        <th>Aksi</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-
-  <button id="downloadBtn" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
-    ⬇️ Download CSV
-  </button>
+  <div class="flex gap-2 mt-4">
+    <button id="downloadBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">⬇️ Download CSV</button>
+    <button id="resetBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold">🗑️ Reset Semua Data</button>
+    <button onclick="logout()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-xl font-bold">Logout</button>
+  </div>
 </div>
 
-<script>
-// Ambil data dari localStorage
-const d = JSON.parse(localStorage.getItem('uks')||'[]');
+</section>
 
-// Update statistik
-let guru=0, pegawai=0, vii=0, viii=0, ix=0, avg=0;
-if(d.length>0){
-  let totalScore = 0;
-  d.forEach(x=>{
-    totalScore += x.score;
-    if(x.role==='Guru') guru++;
-    if(x.role==='Pegawai') pegawai++;
-    if(x.role==='Siswa'){
-      if(x.kelas==='VII') vii++;
-      if(x.kelas==='VIII') viii++;
-      if(x.kelas==='IX') ix++;
-    }
-  });
-  avg = Math.round(totalScore/d.length);
+<script>
+// ==== LOGIN ====
+const USERNAME = "admin";
+const PASSWORD = "uks2026";
+
+function login(){
+  const u = document.getElementById('username').value;
+  const p = document.getElementById('password').value;
+  if(u===USERNAME && p===PASSWORD){
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('admin').classList.remove('hidden');
+    renderAdmin();
+  } else alert('Username / password salah');
 }
 
-document.getElementById('guru').textContent = guru;
-document.getElementById('pegawai').textContent = pegawai;
-document.getElementById('vii').textContent = vii;
-document.getElementById('viii').textContent = viii;
-document.getElementById('ix').textContent = ix;
-document.getElementById('avgScore').textContent = avg;
+function logout(){
+  document.getElementById('login').classList.remove('hidden');
+  document.getElementById('admin').classList.add('hidden');
+}
 
-// Render tabel
-const tbody = document.querySelector('#tableResponden tbody');
-d.forEach((x,i)=>{
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>${i+1}</td>
-    <td>${x.nama}</td>
-    <td>${x.role}</td>
-    <td>${x.kelas}</td>
-    <td>${x.score}</td>
-    <td>${x.saran}</td>
-  `;
-  tbody.appendChild(tr);
-});
+// ==== ADMIN PANEL ====
+function renderAdmin(){
+  const d = JSON.parse(localStorage.getItem('uks')||'[]');
+
+  // Statistik
+  let guru=0, pegawai=0, vii=0, viii=0, ix=0, avg=0;
+  if(d.length>0){
+    let totalScore = 0;
+    d.forEach(x=>{
+      totalScore += x.score;
+      if(x.role==='Guru') guru++;
+      if(x.role==='Pegawai') pegawai++;
+      if(x.role==='Siswa'){
+        if(x.kelas==='VII') vii++;
+        if(x.kelas==='VIII') viii++;
+        if(x.kelas==='IX') ix++;
+      }
+    });
+    avg = Math.round(totalScore/d.length);
+  }
+
+  document.getElementById('guru').textContent = guru;
+  document.getElementById('pegawai').textContent = pegawai;
+  document.getElementById('vii').textContent = vii;
+  document.getElementById('viii').textContent = viii;
+  document.getElementById('ix').textContent = ix;
+  document.getElementById('avgScore').textContent = avg;
+
+  // Render tabel
+  const tbody = document.querySelector('#tableResponden tbody');
+  tbody.innerHTML = '';
+  d.forEach((x,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${x.nama}</td>
+      <td>${x.role}</td>
+      <td>${x.kelas}</td>
+      <td>${x.score}</td>
+      <td>${x.saran}</td>
+      <td><button onclick="hapus(${i})" class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded">Hapus</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  renderChart(d);
+}
+
+// Hapus satu respon
+function hapus(index){
+  if(confirm('Hapus respon ini?')){
+    let d = JSON.parse(localStorage.getItem('uks')||'[]');
+    d.splice(index,1);
+    localStorage.setItem('uks', JSON.stringify(d));
+    renderAdmin();
+  }
+}
+
+// Reset semua data
+document.getElementById('resetBtn').onclick = ()=>{
+  if(confirm('Reset semua data survei?')){
+    localStorage.removeItem('uks');
+    renderAdmin();
+  }
+}
 
 // Download CSV
 document.getElementById('downloadBtn').onclick = ()=>{
+  let d = JSON.parse(localStorage.getItem('uks')||'[]');
   if(d.length===0){ alert('Belum ada data untuk di-download'); return; }
   let csv = "No,Nama,Role,Kelas,Score,Saran\n";
   d.forEach((x,i)=>{
@@ -104,7 +170,41 @@ document.getElementById('downloadBtn').onclick = ()=>{
   a.download = 'responden_uks.csv';
   a.click();
   URL.revokeObjectURL(url);
-};
+}
+
+// ==== CHART ====
+function renderChart(data){
+  const ctx = document.getElementById('chartScore').getContext('2d');
+  const labels = ["Ruang UKS","Obat & Alat","Kecepatan","Keramahan","Manfaat"];
+  const colors = ['#22c55e','#16a34a','#facc15','#f97316','#3b82f6'];
+  
+  // Hitung rata-rata tiap pertanyaan
+  let totals = [0,0,0,0,0];
+  data.forEach(x=>{
+    const score = x.score || 0;
+    // Asumsi 5 pertanyaan likert dengan nilai rata-rata = score (bisa disesuaikan)
+    for(let i=0;i<5;i++) totals[i]+=score;
+  });
+  let avg = totals.map(t=> data.length>0 ? Math.round(t/data.length) : 0);
+
+  if(window.myChart) window.myChart.destroy();
+  window.myChart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'Rata-rata Skor',
+        data:avg,
+        backgroundColor:colors
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ beginAtZero:true, max:100 } }
+    }
+  });
+}
 </script>
 
 </body>
