@@ -2,43 +2,77 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Survei Kepuasan UKS MTs Negeri 9 Bantul</title>
+<title>Survei Kepuasan UKS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-  body { font-family: 'Nunito', sans-serif; }
+body { font-family: 'Nunito', sans-serif; }
 
-  .option {
-    border: 2px solid #e5e7eb;
-    padding: 12px;
-    border-radius: 14px;
-    cursor: pointer;
-    text-align: center;
-    transition: all .2s ease;
-    background: #fff;
-  }
-
-  .option:hover {
-    border-color: #22c55e;
-  }
-
-  .option.active {
-    background: #dcfce7;
-    border-color: #16a34a;
-    color: #166534;
-    font-weight: 700;
-    transform: scale(1.03);
-  }
+.option {
+  border: 2px solid #e5e7eb;
+  padding: 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: all .2s ease;
+  background: #fff;
+}
+.option:hover { border-color: #22c55e; }
+.option.active {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #166534;
+  font-weight: 700;
+  transform: scale(1.03);
+}
+.hidden { display:none; }
 </style>
 </head>
 
-<body class="bg-gradient-to-br from-green-50 via-blue-50 to-lime-50 min-h-screen flex items-center justify-center">
+<body class="bg-gradient-to-br from-green-50 via-blue-50 to-lime-50 min-h-screen">
 
-<div class="max-w-xl w-full bg-white rounded-3xl shadow-xl p-6">
+<div class="max-w-xl mx-auto p-6">
 
-  <!-- DATA RESPONDEN -->
-  <section id="form">
+<!-- ================= HOME ================= -->
+<section id="home">
+  <h1 class="text-3xl font-extrabold text-center text-green-700">
+    Survei Kepuasan Layanan UKS
+  </h1>
+  <p class="text-center font-semibold text-blue-700 mb-6">
+    MTs Negeri 9 Bantul
+  </p>
+
+  <div class="bg-white rounded-3xl shadow-xl p-6 text-center">
+    <p class="font-bold text-lg">📊 Kepuasan Layanan UKS Saat Ini</p>
+    <div class="text-5xl font-extrabold text-green-600 my-3">
+      <span id="avgScore">0</span>/100
+    </div>
+
+    <p id="statusText" class="mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full">
+      Dalam proses peningkatan layanan.
+    </p>
+
+    <div class="mt-6 text-left">
+      <p class="font-bold mb-2">👥 Responden</p>
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <div>Guru: <span id="guru">0</span></div>
+        <div>Pegawai: <span id="pegawai">0</span></div>
+        <div>Siswa Kelas VII: <span id="vii">0</span></div>
+        <div>Siswa Kelas VIII: <span id="viii">0</span></div>
+        <div>Siswa Kelas IX: <span id="ix">0</span></div>
+      </div>
+    </div>
+
+    <button onclick="go('form')" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+      🏥 Mulai Survei
+    </button>
+  </div>
+</section>
+
+<!-- ================= FORM ================= -->
+<section id="form" class="hidden">
+  <div class="bg-white rounded-3xl shadow-xl p-6">
 
     <h2 class="text-2xl font-extrabold text-center text-green-700 mb-6">
       📋 Data Responden
@@ -51,7 +85,6 @@
       Digunakan hanya untuk dokumentasi internal madrasah.
     </p>
 
-    <!-- STATUS -->
     <p class="font-bold mb-2">Status Anda:</p>
     <div class="grid grid-cols-3 gap-3 mb-6" id="statusGroup">
       <div class="option" data-value="Guru">👨‍🏫 Guru</div>
@@ -59,7 +92,6 @@
       <div class="option" data-value="Siswa">👨‍🎓 Siswa</div>
     </div>
 
-    <!-- KELAS -->
     <div id="kelasSection" class="hidden">
       <p class="font-bold mb-2">Kelas:</p>
       <div class="grid grid-cols-3 gap-3 mb-6" id="kelasGroup">
@@ -69,74 +101,124 @@
       </div>
     </div>
 
-    <button onclick="submitData()"
-      class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+    <button onclick="go('survey')" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
       Lanjutkan →
     </button>
+  </div>
+</section>
 
-  </section>
+<!-- ================= SURVEY ================= -->
+<section id="survey" class="hidden">
+  <div class="bg-white rounded-3xl shadow-xl p-6">
+
+    <h2 class="text-xl font-extrabold text-green-700 mb-4">
+      📝 Penilaian Layanan UKS
+    </h2>
+
+    <p class="mb-3 font-semibold">Pelayanan UKS mudah diakses</p>
+    <div class="grid grid-cols-5 gap-2 mb-6" id="likert">
+      <div class="option" data-score="20">1</div>
+      <div class="option" data-score="40">2</div>
+      <div class="option" data-score="60">3</div>
+      <div class="option" data-score="80">4</div>
+      <div class="option" data-score="100">5</div>
+    </div>
+
+    <button onclick="submitSurvey()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+      Kirim Survei
+    </button>
+  </div>
+</section>
+
 </div>
 
 <script>
-let selectedStatus = null;
-let selectedKelas = null;
+let status=null, kelas=null, score=0;
 
-/* ====== GENERIC HIGHLIGHT HANDLER ====== */
-function activate(groupId, element) {
-  document.querySelectorAll(`#${groupId} .option`)
-    .forEach(el => el.classList.remove('active'));
-  element.classList.add('active');
+/* ===== NAV ===== */
+function go(id){
+  ['home','form','survey'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
 }
 
-/* ===== STATUS CLICK ===== */
-document.querySelectorAll('#statusGroup .option').forEach(btn => {
-  btn.addEventListener('click', () => {
-    activate('statusGroup', btn);
-    selectedStatus = btn.dataset.value;
+/* ===== STORAGE ===== */
+function load(){ return JSON.parse(localStorage.getItem('uks')||'[]'); }
+function save(d){ localStorage.setItem('uks',JSON.stringify(d)); }
 
-    // tampilkan kelas hanya jika siswa
-    if (selectedStatus === 'Siswa') {
-      document.getElementById('kelasSection').classList.remove('hidden');
-    } else {
-      document.getElementById('kelasSection').classList.add('hidden');
-      selectedKelas = null;
-      document.querySelectorAll('#kelasGroup .option')
-        .forEach(el => el.classList.remove('active'));
+/* ===== HOME UPDATE ===== */
+function updateHome(){
+  const d=load();
+  if(!d.length)return;
+  const avg=Math.round(d.reduce((a,b)=>a+b.score,0)/d.length);
+  avgScore.textContent=avg;
+  statusText.textContent=avg>=80?'✓ Target minimal kepuasan (80) telah tercapai.':'Dalam proses peningkatan layanan.';
+  statusText.className=avg>=80?
+    'mt-3 bg-green-100 text-green-700 px-3 py-2 rounded-full':
+    'mt-3 bg-orange-100 text-orange-700 px-3 py-2 rounded-full';
+
+  guru.textContent=pegawai.textContent=vii.textContent=viii.textContent=ix.textContent=0;
+  d.forEach(x=>{
+    if(x.role==='Guru')guru.textContent++;
+    if(x.role==='Pegawai')pegawai.textContent++;
+    if(x.role==='Siswa'){
+      if(x.kelas==='VII')vii.textContent++;
+      if(x.kelas==='VIII')viii.textContent++;
+      if(x.kelas==='IX')ix.textContent++;
     }
   });
+}
+updateHome();
+
+/* ===== HIGHLIGHT ===== */
+function activate(group,el){
+  document.querySelectorAll(`#${group} .option`).forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* STATUS */
+statusGroup.querySelectorAll('.option').forEach(b=>{
+  b.onclick=()=>{
+    activate('statusGroup',b);
+    status=b.dataset.value;
+    kelasSection.classList.toggle('hidden',status!=='Siswa');
+  }
 });
 
-/* ===== KELAS CLICK ===== */
-document.querySelectorAll('#kelasGroup .option').forEach(btn => {
-  btn.addEventListener('click', () => {
-    activate('kelasGroup', btn);
-    selectedKelas = btn.dataset.value;
-  });
+/* KELAS */
+kelasGroup.querySelectorAll('.option').forEach(b=>{
+  b.onclick=()=>{
+    activate('kelasGroup',b);
+    kelas=b.dataset.value;
+  }
 });
 
-/* ===== SUBMIT ===== */
-function submitData() {
-  if (!selectedStatus) {
-    alert('Silakan pilih status Anda.');
+/* LIKERT */
+likert.querySelectorAll('.option').forEach(b=>{
+  b.onclick=()=>{
+    activate('likert',b);
+    score=Number(b.dataset.score);
+  }
+});
+
+/* SUBMIT */
+function submitSurvey(){
+  if(!status||!score||(status==='Siswa'&&!kelas)){
+    alert('Lengkapi isian.');
     return;
   }
-  if (selectedStatus === 'Siswa' && !selectedKelas) {
-    alert('Silakan pilih kelas.');
-    return;
-  }
+  const d=load();
+  d.push({role:status,kelas:kelas,score});
+  save(d);
+  resetAll();
+  updateHome();
+  go('home');
+}
 
-  alert(
-    'Data tersimpan:\n' +
-    'Status: ' + selectedStatus +
-    (selectedKelas ? '\nKelas: ' + selectedKelas : '')
-  );
-
-  // reset form (privasi)
-  document.getElementById('nama').value = '';
-  document.querySelectorAll('.option').forEach(el => el.classList.remove('active'));
-  document.getElementById('kelasSection').classList.add('hidden');
-  selectedStatus = null;
-  selectedKelas = null;
+function resetAll(){
+  status=kelas=score=null;
+  document.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
+  nama.value='';
+  kelasSection.classList.add('hidden');
 }
 </script>
 
