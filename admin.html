@@ -5,16 +5,23 @@
 <title>Admin Survei UKS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{font-family:Nunito,sans-serif}
 .hidden{display:none}
+canvas{max-height:300px;}
+@media print {
+  body * {visibility:hidden;}
+  #printArea, #printArea * {visibility:visible;}
+  #printArea {position:absolute; top:0; left:0; width:100%;}
+}
 </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen p-6">
 
-<div class="max-w-5xl mx-auto">
+<div class="max-w-6xl mx-auto">
 
 <!-- LOGIN -->
 <section id="loginBox" class="bg-white rounded-2xl shadow p-6 max-w-md mx-auto">
@@ -22,13 +29,11 @@ body{font-family:Nunito,sans-serif}
     🔐 Login Admin UKS
   </h2>
 
-  <input id="pass"
-    type="password"
-    placeholder="Password admin"
-    class="w-full border-2 rounded-xl p-3 mb-4">
+  <input id="pass" type="password" placeholder="Password admin"
+         class="w-full border-2 rounded-xl p-3 mb-4">
 
   <button onclick="login()"
-    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
+          class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold">
     Masuk
   </button>
 </section>
@@ -36,9 +41,21 @@ body{font-family:Nunito,sans-serif}
 <!-- ADMIN PANEL -->
 <section id="adminPanel" class="hidden">
 
-  <h1 class="text-3xl font-extrabold text-green-700 mb-6">
-    📊 Dashboard Admin UKS
-  </h1>
+  <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+    <h1 class="text-3xl font-extrabold text-green-700 mb-2">
+      📊 Dashboard Admin UKS
+    </h1>
+    <div class="flex gap-2 flex-wrap">
+      <button onclick="toggleFullScreen()"
+        class="bg-purple-600 text-white px-4 py-2 rounded-xl font-bold">
+        🖥 Mode Presentasi
+      </button>
+      <button onclick="window.print()"
+        class="bg-gray-700 text-white px-4 py-2 rounded-xl font-bold">
+        🖨 Print Laporan
+      </button>
+    </div>
+  </div>
 
   <!-- Ringkasan -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -56,8 +73,22 @@ body{font-family:Nunito,sans-serif}
     </div>
   </div>
 
-  <!-- Tombol -->
-  <div class="flex flex-wrap gap-3 mb-4">
+  <!-- Filter -->
+  <div class="flex gap-3 mb-4 flex-wrap">
+    <select id="filterStatus" class="border p-2 rounded">
+      <option value="">Semua Status</option>
+      <option value="Guru">Guru</option>
+      <option value="Pegawai">Pegawai</option>
+      <option value="Siswa">Siswa</option>
+    </select>
+
+    <select id="filterKelas" class="border p-2 rounded">
+      <option value="">Semua Kelas</option>
+      <option value="VII">VII</option>
+      <option value="VIII">VIII</option>
+      <option value="IX">IX</option>
+    </select>
+
     <button onclick="exportCSV()"
       class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold">
       ⬇ Export Excel
@@ -68,12 +99,16 @@ body{font-family:Nunito,sans-serif}
     </button>
   </div>
 
+  <!-- Chart -->
+  <canvas id="chartResponden" class="mb-6"></canvas>
+
   <!-- Tabel -->
-  <div class="bg-white rounded-2xl shadow overflow-x-auto">
+  <div id="printArea" class="bg-white rounded-2xl shadow overflow-x-auto">
     <table class="w-full text-sm">
       <thead class="bg-green-600 text-white">
         <tr>
           <th class="p-2">No</th>
+          <th>Timestamp</th>
           <th>Nama</th>
           <th>Status</th>
           <th>Kelas</th>
@@ -92,34 +127,49 @@ body{font-family:Nunito,sans-serif}
 <script>
 const ADMIN_PASS = "uks9bantul";
 const KEY = "uks";
+let chartInstance;
 
-/* LOGIN */
+/* ===== LOGIN ===== */
 function login(){
   if(pass.value === ADMIN_PASS){
     loginBox.classList.add('hidden');
     adminPanel.classList.remove('hidden');
     loadData();
-  }else{
-    alert("Password salah");
-  }
+  } else alert("Password salah");
 }
 
-/* LOAD DATA */
+/* ===== FULL SCREEN ===== */
+function toggleFullScreen(){
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else { document.exitFullscreen(); }
+}
+
+/* ===== LOAD DATA ===== */
+const filterStatus = document.getElementById('filterStatus');
+const filterKelas = document.getElementById('filterKelas');
+
+filterStatus.onchange = filterKelas.onchange = loadData;
+
 function loadData(){
-  const d = JSON.parse(localStorage.getItem(KEY)||'[]');
+  let d = JSON.parse(localStorage.getItem(KEY)||'[]');
+  const status = filterStatus.value;
+  const kelasF = filterKelas.value;
+  if(status) d = d.filter(x=>x.role===status);
+  if(kelasF) d = d.filter(x=>x.kelas===kelasF);
 
   total.textContent = d.length;
-  avg.textContent = d.length
-    ? Math.round(d.reduce((a,b)=>a+b.score,0)/d.length)
-    : 0;
-
+  avg.textContent = d.length ? Math.round(d.reduce((a,b)=>a+b.score,0)/d.length) : 0;
   saranCount.textContent = d.filter(x=>x.saran && x.saran.trim()).length;
+
+  renderChart(d);
 
   tbody.innerHTML='';
   d.forEach((x,i)=>{
     tbody.innerHTML += `
       <tr class="border-b">
-        <td class="p-2 text-center">${i+1}</td>
+        <td class="p-2 text-center">${x.nomor || i+1}</td>
+        <td>${x.timestamp || '-'}</td>
         <td>${x.nama||'-'}</td>
         <td>${x.role}</td>
         <td>${x.kelas||'-'}</td>
@@ -129,14 +179,36 @@ function loadData(){
   });
 }
 
-/* EXPORT CSV */
+/* ===== CHART ===== */
+function renderChart(data){
+  const ctx = document.getElementById('chartResponden').getContext('2d');
+  const labels = ['Guru','Pegawai','VII','VIII','IX'];
+  const counts = [
+    data.filter(d=>d.role==='Guru').length,
+    data.filter(d=>d.role==='Pegawai').length,
+    data.filter(d=>d.kelas==='VII').length,
+    data.filter(d=>d.kelas==='VIII').length,
+    data.filter(d=>d.kelas==='IX').length
+  ];
+  if(chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{label:'Jumlah Responden', data:counts, backgroundColor:['#16a34a','#15803d','#22c55e','#84cc16','#facc15']}]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+}
+
+/* ===== EXPORT CSV ===== */
 function exportCSV(){
   const d = JSON.parse(localStorage.getItem(KEY)||'[]');
   if(!d.length){ alert('Data kosong'); return; }
 
-  let csv = "No,Nama,Status,Kelas,Skor,Saran\n";
+  let csv = "No,Timestamp,Nama,Status,Kelas,Skor,Saran\n";
   d.forEach((x,i)=>{
-    csv += `${i+1},${x.nama||''},${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
+    csv += `${x.nomor||i+1},"${x.timestamp||''}","${x.nama||''}",${x.role},${x.kelas||''},${x.score},"${(x.saran||'').replace(/"/g,'""')}"\n`;
   });
 
   const blob = new Blob([csv],{type:'text/csv'});
@@ -146,7 +218,7 @@ function exportCSV(){
   a.click();
 }
 
-/* CLEAR DATA */
+/* ===== CLEAR DATA ===== */
 function clearData(){
   if(confirm('Hapus semua data survei?')){
     localStorage.removeItem(KEY);
