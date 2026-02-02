@@ -232,9 +232,10 @@ function submitSurvey() {
 
   const data = {nama, role, kelas, score, saran};
 
- fetch("https://script.google.com/macros/s/AKfycbyLMqfcs5hMkDK9xz1jKWII2YuxzAzmUwAugLPOd1aeL4Pw6NRD-Zb5qP6rL75D04g/exec", {
+ fetch("https://script.google.com/macros/s/AKfycbxUJbjS0_q4l6bI72runlTP1Jw9UJkX1OttfEnbyZAijwJk-RWdrx29XJq2tXdm5BT3/exec", {
   method: "POST",
-  body: JSON.stringify(data)
+  body: JSON.stringify(data),
+  mode: "cors"   // ← pastikan mode CORS aktif
 })
 .then(res => res.json())
 .then(resp => {
@@ -244,6 +245,7 @@ function submitSurvey() {
   go('home');
 })
 .catch(err => {
+  console.error("Fetch error:", err);
   alert("Gagal kirim survei: " + err);
 });
 }
