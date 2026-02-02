@@ -186,31 +186,49 @@ function startSurvey(){
 }
 
 /* ===== HIGHLIGHT FIX (INTI PERBAIKAN) ===== */
+<script>
 function renderQ(){
-  document.getElementById('qNum').textContent=`Pertanyaan ${qi+1}/5`;
-  document.getElementById('qText').textContent=questions[qi];
+  document.getElementById('qNum').textContent = `Pertanyaan ${qi+1}/5`;
+  document.getElementById('qText').textContent = questions[qi];
 
-  const o=document.getElementById('opts');
-  o.innerHTML='';
+  const o = document.getElementById('opts');
+  o.innerHTML = '';
 
-  opts.forEach(x=>{
-    const b=document.createElement('button');
-    b.className='likert-option border-2 rounded-xl p-3';
-    b.textContent=x.t;
+  opts.forEach(x => {
+    const b = document.createElement('button');
+    b.className = 'likert-option border-2 rounded-xl p-3';
+    b.textContent = x.t;
 
-    b.onclick=()=>{
-      o.querySelectorAll('.likert-option')
-        .forEach(el=>el.classList.remove('selected'));
+    // 🔹 jika sebelumnya sudah dijawab → tampilkan highlight
+    if (answers[qi] === x.v) {
       b.classList.add('selected');
-      answers[qi]=x.v;
-      document.getElementById('nextQ').disabled=false;
+      document.getElementById('nextQ').disabled = false;
+    }
+
+    b.onclick = () => {
+      // 🔥 hapus highlight tombol lain
+      o.querySelectorAll('.likert-option')
+        .forEach(el => el.classList.remove('selected'));
+
+      // 🔥 aktifkan highlight tombol ini
+      b.classList.add('selected');
+
+      // simpan jawaban
+      answers[qi] = x.v;
+
+      // aktifkan tombol lanjut
+      document.getElementById('nextQ').disabled = false;
     };
 
     o.appendChild(b);
   });
 
-  document.getElementById('nextQ').disabled=true;
+  // default: disable tombol lanjut
+  if (!answers[qi]) {
+    document.getElementById('nextQ').disabled = true;
+  }
 }
+</script>
 
 function nextQ(){
   qi++;
