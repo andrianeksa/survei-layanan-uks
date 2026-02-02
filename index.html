@@ -199,28 +199,37 @@ function nextQ(){
 }
 
 /* ===== SUBMIT KE GOOGLE SHEET ===== */
-function submitSurvey(){
+function submitSurvey() {
   const score = Math.round(answers.reduce((a,b)=>a+b,0)/answers.length);
   const saran = document.getElementById('saranText').value;
 
-  const data = { nama, role, kelas, score, saran };
+  const data = {
+    nama,
+    role,
+    kelas,
+    score,
+    saran
+  };
 
-  fetch("https://script.google.com/macros/s/AKfycbxKNlnL6IRM7wfMvfurwct0KGmatGBQyEhfu3VLveaL03S6JjkahCDWhXLgGUlSwcVT/exec", {
+  fetch("https://script.google.com/macros/s/AKfycby-sPxhO1dMXRqQ8UHMipUQyLS_brGrYZf8PT1kAEWoRfKSNzL2XFcb1T56gBrJ5kM/exec", {
     method: "POST",
-    mode: "cors",        // penting supaya tidak CORS error
+    mode: "cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
   .then(res => res.json())
   .then(resp => {
-    alert("Survei berhasil dikirim!");
-    document.getElementById('saranText').value='';
-    updateHome();
-    go('home');
+    if(resp.status === 'ok'){
+      alert("Survei berhasil dikirim!");
+      document.getElementById('saranText').value='';
+      updateHome();
+      go('home');
+    } else {
+      alert("Gagal kirim survei: " + resp.message);
+    }
   })
   .catch(err => {
-    console.error(err);
-    alert("Gagal kirim survei: periksa console");
+    alert("Gagal kirim survei: " + err);
   });
 }
 
